@@ -1,14 +1,22 @@
+/* Global */
+:root {
+  --background: #1c1d1d;
+  --text-white: #ffffff;
+  --primary: #eb6301;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  /* width = content + padding + border */
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
-  background: #1c1d1d;
-  color: #ffffff;
+  background: var(--background);
+  color: var(--text-white);
   overflow-x: hidden;
 }
 
@@ -22,34 +30,30 @@ nav {
   justify-content: space-between;
   align-items: center;
   z-index: 1000;
-  background: rgba(28, 29, 29, 0.8);
   backdrop-filter: blur(10px);
   transition: all 0.3s;
-}
-
-nav.scrolled {
-  padding: 15px 50px;
-  background: rgba(28, 29, 29, 0.95);
 }
 
 .logo {
   font-size: 24px;
   font-weight: 700;
   letter-spacing: 2px;
-  background: linear-gradient(135deg, #eb6301 0%, #ff8534 100%);
-  -webkit-background-clip: text;
+  background: linear-gradient(135deg, var(--primary) 0%, #ff8534 100%);
   background-clip: text;
+  -webkit-background-clip: text;
+  /* Safari / Chrome */
   -webkit-text-fill-color: transparent;
+  /* Safari / Chrome */
 }
 
 .nav-links {
   display: flex;
-  gap: 40px;
+  gap: 30px;
   list-style: none;
 }
 
 .nav-links a {
-  color: #ffffff;
+  color: var(--text-white);
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
@@ -64,7 +68,7 @@ nav.scrolled {
   left: 0;
   width: 0;
   height: 2px;
-  background: linear-gradient(135deg, #eb6301 0%, #eb6301 100%);
+  background: var(--primary);
   transition: width 0.3s;
 }
 
@@ -101,7 +105,7 @@ nav.scrolled {
 }
 
 .hero-strong {
-  color: #eb6301;
+  color: var(--primary);
   font-size: 2rem;
   font-weight: 600;
   text-align: center;
@@ -123,6 +127,7 @@ nav.scrolled {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -135,29 +140,10 @@ nav.scrolled {
   padding: 0 20px;
 }
 
-.hero-content h1 {
-  font-size: 80px;
-  font-weight: 900;
-  margin-bottom: 20px;
-  line-height: 1.2;
-  background: linear-gradient(135deg, #ffffff 0%, #eb6301 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: fadeInUp 1s ease-out;
-}
-
-.hero-content p {
-  font-size: 24px;
-  color: #aaaaaa;
-  margin-bottom: 40px;
-  animation: fadeInUp 1s ease-out 0.2s both;
-}
-
 .cta-button {
   display: inline-block;
   padding: 18px 45px;
-  background: linear-gradient(135deg, #eb6301 0%, #ff8534 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, #ff8534 100%);
   color: #ffffff;
   text-decoration: none;
   border-radius: 50px;
@@ -177,6 +163,7 @@ nav.scrolled {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -195,7 +182,7 @@ section {
   font-weight: 800;
   margin-bottom: 60px;
   text-align: center;
-  background: linear-gradient(135deg, #ffffff 0%, #eb6301 100%);
+  background: linear-gradient(135deg, #ffffff 0%, var(--primary) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -246,7 +233,7 @@ section {
 }
 
 .portfolio-item:hover {
-  box-shadow: 0 0 0 2px #eb6301, 0 0 20px rgba(235, 99, 1, 0.3);
+  box-shadow: 0 0 0 2px var(--primary), 0 0 20px rgba(235, 99, 1, 0.3);
 }
 
 .portfolio-item:hover .portfolio-video iframe {
@@ -259,7 +246,6 @@ section {
   left: 0;
   right: 0;
   padding: 20px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
   z-index: 1;
   transition: opacity 0.3s ease;
 }
@@ -268,11 +254,6 @@ section {
   font-size: 24px;
   font-weight: 700;
   margin-bottom: 10px;
-}
-
-.portfolio-info p {
-  font-size: 14px;
-  color: #e0e0e0;
 }
 
 /* Services */
@@ -284,14 +265,11 @@ section {
 
 .service-card {
   padding: 40px;
-  background: rgba(255, 255, 255, 0.03);
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s;
 }
 
 .service-card:hover {
-  background: rgba(255, 255, 255, 0.05);
   border-color: rgba(235, 99, 1, 0.5);
   transform: translateY(-5px);
 }
@@ -337,6 +315,68 @@ section {
   line-height: 1.8;
 }
 
+/* Contact Form */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 40px 0;
+  text-align: left;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.form-group label .optional {
+  color: #888888;
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 12px 16px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(235, 99, 1, 0.3);
+  border-radius: 8px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #777777;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: var(--primary);
+  box-shadow: 0 0 10px rgba(235, 99, 1, 0.2);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.contact-form .cta-button {
+  margin-top: 10px;
+  width: 100%;
+}
+
 .contact-info {
   display: flex;
   flex-direction: column;
@@ -350,7 +390,7 @@ section {
 }
 
 .contact-item a {
-  color: #eb6301;
+  color: var(--primary);
   text-decoration: none;
   transition: color 0.3s;
 }
@@ -371,19 +411,30 @@ footer {
 @media (max-width: 768px) {
   nav {
     padding: 15px 20px;
+    justify-content: center;
+  }
+
+  .hero-text {
+    font-size: medium;
+  }
+
+  .hero-strong  {
+    display: block;
+    font-size: medium;
+  }
+
+  /* 상단 로고 축소 및 데스크톱 메뉴 숨김 (모바일 전용) */
+  .logo {
+    font-size: 16px;
+    letter-spacing: 1px;
+    transition: font-size 0.2s ease;
   }
 
   .nav-links {
-    gap: 20px;
+    display: none !important;
   }
 
-  .hero-content h1 {
-    font-size: 48px;
-  }
-
-  .hero-content p {
-    font-size: 18px;
-  }
+  /* Removed unused .hero-content h1 / p rules (no h1/p inside .hero-content) */
 
   section {
     padding: 60px 20px;
