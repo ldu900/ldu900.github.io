@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
       caption: "행사 홍보 영상",
     },
     {
-      src: "https://www.youtube.com/embed/2itCT-kxTWs?si=f07R6Nxbg3CNmJhR",
+      src: "https://www.youtube.com/watch?v=wvpephW_A9g",
       title: "YouTube video player",
       caption: "브랜드 홍보 영상",
     },
