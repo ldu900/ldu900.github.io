@@ -1,9 +1,4 @@
-@font-face {
-  font-family: 'Pretendard';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Thin.woff2') format('woff2');
-  font-weight: 100;
-  font-display: swap;
-}
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
 
 :root {
   --background: #1c1d1d;
@@ -25,7 +20,7 @@ body {
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     'Helvetica Neue', Arial, sans-serif;
   background: #ffffff;
-  color: var(--text-white);
+  color: var(--text-dark);
   overflow-x: hidden;
 }
 
@@ -63,10 +58,11 @@ body {
 }
 
 .section-title {
-  font-size: 48px;
+  font-size: 2.75rem;
   font-weight: 800;
-  margin-bottom: 60px;
+  margin-bottom: 56px;
   text-align: center;
+  letter-spacing: -0.5px;
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -75,28 +71,29 @@ body {
 
 .cta-button {
   display: inline-block;
-  padding: 18px 45px;
+  padding: 16px 42px;
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
   color: #ffffff;
   text-decoration: none;
   border-radius: 50px;
   font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
   transition: all 0.3s;
   animation: fadeInUp 1s ease-out 0.4s both;
-  box-shadow: 0 10px 30px rgba(235, 99, 1, 0.3);
+  box-shadow: 0 8px 24px rgba(235, 99, 1, 0.28);
   border: none;
   cursor: pointer;
   font-family: inherit;
-  font-size: 1rem;
 }
 
 .cta-button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 15px 40px rgba(235, 99, 1, 0.5);
+  box-shadow: 0 14px 36px rgba(235, 99, 1, 0.42);
 }
 
 @media (max-width: 768px) {
   .section-title {
-    font-size: 36px;
+    font-size: 2rem;
   }
 }

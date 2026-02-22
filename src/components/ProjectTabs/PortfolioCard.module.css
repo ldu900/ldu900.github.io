@@ -1,7 +1,7 @@
 .card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(235, 99, 1, 0.15);
-  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid rgba(28, 29, 29, 0.08);
+  border-radius: 14px;
   overflow: hidden;
   transition: all 0.3s ease;
   display: flex;
@@ -9,8 +9,8 @@
 }
 
 .card:hover {
-  border-color: rgba(235, 99, 1, 0.4);
-  box-shadow: 0 8px 25px rgba(235, 99, 1, 0.15);
+  border-color: rgba(235, 99, 1, 0.3);
+  box-shadow: 0 8px 32px rgba(235, 99, 1, 0.12);
   transform: translateY(-4px);
 }
 
@@ -20,7 +20,7 @@
   padding-bottom: 56.25%;
   height: 0;
   overflow: hidden;
-  background: #000;
+  background: #111;
 }
 
 .videoWrap iframe {
@@ -34,26 +34,28 @@
 }
 
 .info {
-  padding: 20px;
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 .title {
-  font-size: 24px;
+  font-size: 0.95rem;
   font-weight: 700;
-  color: #1c1d1d;
-  line-height: 1.4;
+  color: var(--text-dark);
+  line-height: 1.45;
+  letter-spacing: -0.2px;
   margin: 0;
+  word-break: keep-all;
 }
 
 @media (max-width: 768px) {
   .info {
-    padding: 16px;
+    padding: 14px 16px;
   }
 
   .title {
-    font-size: 16px;
+    font-size: 0.875rem;
   }
 }
