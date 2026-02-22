@@ -1,0 +1,35 @@
+.footer {
+  padding: 40px 50px;
+  text-align: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+.footer p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.socialLinks {
+  position: absolute;
+  right: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 12px;
+}
+
+.socialLinks a {
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  transition: transform 0.2s ease;
+}
+
+.socialLinks a:hover {
+  transform: translateY(-2px);
+}

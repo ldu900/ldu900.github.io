@@ -1,0 +1,57 @@
+.hero {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background-image: url('/assets/main/web-main.svg');
+  background-size: cover;
+  background-position: center;
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+  z-index: 1;
+  padding: 0 20px;
+}
+
+.heroText {
+  color: var(--text-dark);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.heroTitle {
+  font-family: 'Century Gothic', 'Futura', sans-serif;
+  font-size: 2.25rem;
+  font-weight: 200;
+  font-style: italic;
+  letter-spacing: -1px;
+}
+
+.heroTitleBold {
+  font-weight: 900;
+}
+
+.heroSubtitle {
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+  .heroTitle {
+    font-size: 1.75rem;
+  }
+
+  .heroSubtitle {
+    font-size: 1rem;
+  }
+}

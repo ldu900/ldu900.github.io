@@ -1,0 +1,142 @@
+nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 20px 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s;
+}
+
+nav::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 30px;
+  right: 30px;
+  height: 1px;
+  background: rgba(28, 29, 29, 0.3);
+}
+
+.logo {
+  width: 70px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  display: inline-block;
+}
+
+.logo img {
+  width: 100%;
+  height: 100%;
+}
+
+.logo:hover {
+  opacity: 0.8;
+}
+
+.navLinks {
+  display: flex;
+  gap: 30px;
+  list-style: none;
+}
+
+.navLinks a {
+  color: #1c1d1d;
+  text-decoration: none;
+  font-size: 1.25rem;
+  font-weight: 600;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.navLinks a::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--primary);
+  transition: width 0.3s;
+}
+
+.navLinks a:hover::after {
+  width: 100%;
+}
+
+.navLinks a.active {
+  color: var(--primary);
+}
+
+.navLinks a.active::after {
+  width: 100%;
+}
+
+/* Dropdown */
+.dropdown {
+  position: relative;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #ffffff;
+  border: 1px solid rgba(235, 99, 1, 0.2);
+  border-radius: 8px;
+  list-style: none;
+  padding: 10px 0;
+  min-width: 150px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-15px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-top: 10px;
+}
+
+.dropdown:hover .dropdownMenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdownMenu li {
+  padding: 0;
+}
+
+.dropdownMenu a {
+  display: block;
+  padding: 12px 20px;
+  color: #333333;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.dropdownMenu a::after {
+  display: none;
+}
+
+.dropdownMenu a:hover {
+  color: var(--primary);
+  background: rgba(235, 99, 1, 0.05);
+}
+
+@media (max-width: 768px) {
+  nav {
+    padding: 15px 20px;
+    justify-content: center;
+  }
+
+  .navLinks {
+    display: none;
+  }
+}

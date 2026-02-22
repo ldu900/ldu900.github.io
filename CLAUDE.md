@@ -4,53 +4,55 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Static portfolio website for **Moldoo STUDIO**, a Korean creative production company. Hosted on GitHub Pages at `moldoo.info`. No build process, no package manager, no dependencies — files are served directly.
+Portfolio website for **Moldoo STUDIO**, a Korean creative production company. Hosted on GitHub Pages at `moldoo.info`. Built with Vite + React 18, deployed via GitHub Actions.
 
 ## Development
 
-To preview the site locally, open any HTML file in a browser or serve the directory with any static file server:
-
 ```bash
-python3 -m http.server 8080
-# or
-npx serve .
+npm run dev      # localhost:5173
+npm run build    # outputs to dist/
+npm run preview  # preview the dist/ build
 ```
 
-There are no build, lint, or test commands.
+No lint or test commands.
 
 ## Architecture
 
-Multi-page static site with shared CSS and modular JavaScript.
+Single-page app using React Router v6 with **HashRouter** (required for GitHub Pages — no 404 redirect needed).
 
-**Pages:** `index.html` (home), `about.html`, `project.html` (primary portfolio), `portfolio.html` (alternate view), `contact.html`
+**Routing:** `/#/` → HomePage, `/#/about` → AboutPage, `/#/project` → ProjectPage, `/#/contact` → ContactPage
 
-**Stylesheet:** `style.css` — single file (~1,200 lines) for all pages. Uses CSS custom properties defined in `:root`:
-- `--background: #1c1d1d` (dark theme)
-- `--text-white: #ffffff`
+**Entry:** `src/main.jsx` → `src/App.jsx` (wraps everything in HashRouter + shared Navbar/Footer)
+
+**Styling:** Mix of `src/global.css` (CSS custom properties, resets, shared keyframes) and CSS Modules per component (`.module.css` files). CSS vars defined in `:root`:
+- `--background: #1c1d1d` (dark)
 - `--primary: #eb6301` (orange accent)
+- `--text-white: #ffffff`
 
-Responsive breakpoints: **768px** (mobile) and **1024px** (tablet).
+Responsive breakpoints: **768px** (mobile), **1024px** (tablet). Font: Pretendard via CDN.
 
-**Font:** Pretendard (Korean-optimized) via CDN.
+**Data arrays** in `src/data/`:
+- `videos.js` — YouTube video entries for FILM tab (each needs a video ID + metadata)
+- `designs.js` — Design portfolio items for DESIGN tab
+- `services.js` — 6 service card entries (Korean labels)
 
-**JavaScript modules** (`javascript/` directory):
-- `navbar.js` — Fixed navbar with scroll effect (adds `.scrolled` class at 50px), active page highlighting, dropdown for PROJECT section, sessionStorage for tab state
-- `portfolio.js` — YouTube video embed tab system (FILM / DESIGN tabs) with IntersectionObserver lazy loading; first 3 videos load eagerly, rest load with 200px margin
-- `design.js` — Renders design portfolio items with gradient fallback for failed images
-- `services.js` — Dynamically renders 6 service cards (Korean labels)
-- `contact-form.js` — EmailJS integration for contact form with phone (9–11 digit) and email validation
-- `smooth.js` — Smooth scroll for anchor links
+**Key components:**
+- `src/components/Navbar/` — scroll detection via `src/hooks/useScrolledNavbar.js` (adds `.scrolled` at 50px), active route highlighting via `useLocation`
+- `src/components/ProjectTabs/ProjectTabs.jsx` — FILM/DESIGN tab switcher; tab state stored in URL query param `?tab=film|design` via `useSearchParams`
+- `src/components/ProjectTabs/PortfolioCard.jsx` — YouTube iframe lazy loading using `react-intersection-observer`; first 3 cards load eagerly, rest on scroll with 200px margin
+- `src/components/ProjectTabs/DesignCard.jsx` — Design item card with gradient fallback for failed images
+- `src/components/ContactForm/` — EmailJS integration (`@emailjs/browser`) with phone (9–11 digit) and email validation
 
-**Assets:** `assets/` — SVGs for icons/logos, PNGs for portfolio images. Note: `assets/design/achv.png` is ~11 MB.
+**Assets:** Stored in `public/assets/` and referenced as `/assets/...` in JSX.
 
 ## Key Implementation Details
 
-**EmailJS** (contact form): Credentials are hardcoded in `contact-form.js` — this is intentional for a client-side-only site. The public key is safe to expose; the service/template IDs are EmailJS-specific.
+**EmailJS:** Credentials in `.env` as `VITE_EMAILJS_*` — intentionally not gitignored since these are public client-side keys by design.
 
-**Tab state**: `project.html` uses `sessionStorage` (key managed in `navbar.js`) to preserve the active tab (FILM/DESIGN) when navigating back to the page.
+**Deploy:** `.github/workflows/deploy.yml` runs `npm run build` then deploys `dist/` via `peaceiris/actions-gh-pages@v4`.
 
-**Adding portfolio videos**: Edit the video array in `portfolio.js`. Each entry needs a YouTube video ID and metadata; the lazy-loading logic handles iframe injection automatically.
+**Language:** Site content is primarily Korean (`<html lang="ko">`).
 
-**Adding design items**: Edit the items array in `design.js`. The component renders a card with an image and fallback gradient if the image fails to load.
+**Adding portfolio videos:** Add an entry to `src/data/videos.js`. The lazy-loading logic in `PortfolioCard.jsx` handles iframe injection automatically.
 
-**Language**: Site content is primarily Korean (`<html lang="ko">`).
+**Adding design items:** Add an entry to `src/data/designs.js`.

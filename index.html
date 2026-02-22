@@ -5,42 +5,11 @@
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Moldoo STUDIO</title>
-	<link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-	<nav id="navbar">
-		<a href="index.html" class="logo">
-			<img src="assets/logo.svg" alt="Moldoo STUDIO Logo" class="logo-image" />
-		</a>
-		<ul class="nav-links">
-			<li><a href="index.html">HOME</a></li>
-			<li><a href="about.html">ABOUT</a></li>
-			<li class="dropdown">
-				<a href="project.html">PROJECT</a>
-				<ul class="dropdown-menu">
-					<li><a href="project.html#video-tab">FILM</a></li>
-					<li><a href="project.html#design-tab">DESIGN</a></li>
-				</ul>
-			</li>
-			<li><a href="contact.html">CONTACT</a></li>
-		</ul>
-	</nav>
-
-	<section id="home" class="hero">
-		<div class="hero-content">
-			<h2 class="hero-text">
-				<span class="hero-title">
-					We do more, <span class="hero-title-bold">Moldoo</span>
-				</span>
-				<span class="hero-subtitle">고객의 니즈 그 이상을 실현하는 올라운더 크리에이티브 그룹</span>
-			</h2>
-		</div>
-	</section>
-
-	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-	<script src="javascript/navbar.js"></script>
-	<script src="javascript/smooth.js"></script>
+	<div id="root"></div>
+	<script type="module" src="/src/main.jsx"></script>
 </body>
 
 </html>
