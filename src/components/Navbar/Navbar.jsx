@@ -18,7 +18,7 @@ export default function Navbar() {
     close();
   };
 
-  // 메뉴 열릴 때 스크롤 방지
+  // 모바일 메뉴 열릴 때 스크롤 방지
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
@@ -31,6 +31,7 @@ export default function Navbar() {
 
   return (
     <>
+      {/* 데스크탑 Nav */}
       <nav className={scrolled ? styles.scrolled : ''}>
         <Link to="/" className={styles.logo} onClick={close}>
           <img src="/assets/logo/logo.svg" alt="Moldoo STUDIO Logo" />
@@ -58,25 +59,41 @@ export default function Navbar() {
             <Link to="/contact" className={isActive('/contact') ? styles.active : ''}>CONTACT</Link>
           </li>
         </ul>
-
-        <button
-          className={`${styles.menuBtn}${isOpen ? ` ${styles.menuBtnOpen}` : ''}`}
-          onClick={() => setIsOpen((o) => !o)}
-          aria-label="메뉴"
-        >
-          <span />
-          <span />
-          <span />
-        </button>
       </nav>
 
-      {/* 모바일 풀스크린 메뉴 */}
-      <div className={`${styles.mobileMenu}${isOpen ? ` ${styles.mobileMenuOpen}` : ''}`}>
-        <ul className={styles.mobileLinks}>
-          <li><Link to="/" onClick={close} className={isActive('/') ? styles.active : ''}>HOME</Link></li>
-          <li><Link to="/about" onClick={close} className={isActive('/about') ? styles.active : ''}>ABOUT</Link></li>
-          <li><Link to="/project" onClick={close} className={isActive('/project') ? styles.active : ''}>PROJECT</Link></li>
-          <li><Link to="/contact" onClick={close} className={isActive('/contact') ? styles.active : ''}>CONTACT</Link></li>
+      {/* 모바일 바텀 시트 Nav */}
+      <div className={`${styles.bottomSheet}${isOpen ? ` ${styles.bottomSheetOpen}` : ''}`}>
+        {/* 핸들 영역 — 탭하면 열기/닫기 */}
+        <button
+          className={styles.sheetToggle}
+          onClick={() => setIsOpen((o) => !o)}
+          aria-label={isOpen ? '메뉴 닫기' : '메뉴 열기'}
+        >
+          <span className={styles.handlePill} />
+          <span className={styles.handleRow}>
+            <img src="/assets/logo/logo.svg" alt="Moldoo STUDIO" className={styles.sheetLogo} />
+            <span className={`${styles.chevron}${isOpen ? ` ${styles.chevronUp}` : ''}`}>
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path d="M4 11.5L9 6.5L14 11.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </span>
+          </span>
+        </button>
+
+        {/* 메뉴 항목 */}
+        <ul className={styles.sheetLinks}>
+          <li>
+            <Link to="/" onClick={close} className={isActive('/') ? styles.active : ''}>HOME</Link>
+          </li>
+          <li>
+            <Link to="/about" onClick={close} className={isActive('/about') ? styles.active : ''}>ABOUT</Link>
+          </li>
+          <li>
+            <Link to="/project" onClick={close} className={isActive('/project') ? styles.active : ''}>PROJECT</Link>
+          </li>
+          <li>
+            <Link to="/contact" onClick={close} className={isActive('/contact') ? styles.active : ''}>CONTACT</Link>
+          </li>
         </ul>
       </div>
     </>

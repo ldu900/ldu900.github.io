@@ -1,3 +1,6 @@
+/* ================================
+   데스크탑 Nav
+   ================================ */
 nav {
   position: fixed;
   top: 0;
@@ -51,7 +54,7 @@ nav::after {
   opacity: 0.7;
 }
 
-/* 데스크탑 nav */
+/* 데스크탑 링크 */
 .navLinks {
   display: flex;
   gap: 40px;
@@ -149,123 +152,130 @@ nav::after {
   background: rgba(235, 99, 1, 0.05);
 }
 
-/* 햄버거 버튼 */
-.menuBtn {
+
+/* ================================
+   모바일 바텀 시트 Nav
+   ================================ */
+
+.bottomSheet {
   display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   flex-direction: column;
-  justify-content: center;
-  gap: 5px;
-  width: 36px;
-  height: 36px;
+  background: #ffffff;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -4px 40px rgba(0, 0, 0, 0.12);
+  z-index: 999;
+  height: 64px;
+  overflow: hidden;
+  transition: height 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bottomSheetOpen {
+  height: 72vh;
+}
+
+/* 핸들 영역 — 항상 64px 높이로 보임 */
+.sheetToggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 64px;
+  height: 64px;
+  padding: 10px 24px 8px;
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px;
-  position: relative;
-  z-index: 1001;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
-.menuBtn span {
-  display: block;
-  width: 100%;
-  height: 1.5px;
-  background: var(--text-dark);
+/* 상단 드래그 필 */
+.handlePill {
+  width: 36px;
+  height: 4px;
+  background: rgba(28, 29, 29, 0.15);
   border-radius: 2px;
-  transition: all 0.3s ease;
-  transform-origin: center;
+  flex-shrink: 0;
 }
 
-/* X 아이콘 */
-.menuBtnOpen span:nth-child(1) {
-  transform: translateY(6.5px) rotate(45deg);
-}
-
-.menuBtnOpen span:nth-child(2) {
-  opacity: 0;
-  transform: scaleX(0);
-}
-
-.menuBtnOpen span:nth-child(3) {
-  transform: translateY(-6.5px) rotate(-45deg);
-}
-
-/* 모바일 풀스크린 메뉴 */
-.mobileMenu {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.97);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  z-index: 999;
-  flex-direction: column;
+/* 로고 + 화살표 행 */
+.handleRow {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
+  justify-content: space-between;
+  width: 100%;
+  flex: 1;
 }
 
-.mobileMenuOpen {
-  opacity: 1;
-  pointer-events: all;
+.sheetLogo {
+  height: 26px;
+  width: auto;
 }
 
-.mobileLinks {
+.chevron {
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chevronUp {
+  transform: rotate(180deg);
+}
+
+/* 메뉴 항목 목록 */
+.sheetLinks {
   list-style: none;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 0 40px;
+  justify-content: center;
+  flex: 1;
+  padding: 16px 40px 32px;
+  gap: 0;
 }
 
-.mobileLinks > li {
+.sheetLinks li {
   width: 100%;
-  text-align: center;
 }
 
-.mobileLinks a,
-.mobileMenuLabel {
+.sheetLinks a {
   display: block;
-  padding: 16px 0;
+  padding: 18px 0;
+  text-align: center;
   color: var(--text-dark);
   text-decoration: none;
   font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  transition: color 0.2s;
   border-bottom: 1px solid rgba(28, 29, 29, 0.06);
+  transition: color 0.2s;
 }
 
-.mobileLinks a.active,
-.mobileLinks a:hover {
+.sheetLinks a.active {
+  color: var(--primary);
+}
+
+.sheetLinks a:hover {
   color: var(--primary);
 }
 
 
+/* ================================
+   모바일 미디어 쿼리
+   ================================ */
 @media (max-width: 768px) {
+  /* 상단 nav 숨기기 */
   nav {
-    padding: 16px 24px;
-    background: rgba(255, 255, 255, 0.94);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-  }
-
-  nav::after {
     display: none;
   }
 
-  .navLinks {
-    display: none;
-  }
-
-  .menuBtn {
-    display: flex;
-  }
-
-  .mobileMenu {
+  /* 바텀 시트 표시 */
+  .bottomSheet {
     display: flex;
   }
 }

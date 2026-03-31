@@ -96,4 +96,9 @@ body {
   .section-title {
     font-size: 2rem;
   }
+
+  /* 바텀 시트 collapsed 높이만큼 body 하단 여백 */
+  body {
+    padding-bottom: 64px;
+  }
 }
