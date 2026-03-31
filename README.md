@@ -14,4 +14,5 @@ data/designs.js 파일 수정
 git add .
 git commit -m "수정사항 요약 정리"
 git push
+npm run build
 ```
