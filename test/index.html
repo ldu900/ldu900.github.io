@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOLDOO | Dynamic Liquid Gradient</title>
+    <style>
+        /* 기본 리셋 및 폰트 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html {
+            width: 100%;
+            height: 100%;
+            font-family: 'Helvetica Neue', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+            background-color: #0e0f0f; /* 브랜드 기본 배경색 */
+            overflow: hidden; /* 스크롤 방지 */
+        }
+
+        /* -------------------------------------
+           그래디언트 배경 컨테이너
+        ------------------------------------- */
+        .gradient-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            overflow: hidden;
+            z-index: 0;
+            background: #0e0f0f;
+        }
+
+        /* 쫀득한 유체(Gooey) 효과를 위한 SVG 필터 */
+        svg { display: none; }
+
+        .gradients-container {
+            filter: url(#goo) blur(30px); /* 블러를 살짝 줄여 형태를 더 역동적으로 유지 */
+            width: 100%;
+            height: 100%;
+        }
+
+        /* -------------------------------------
+           액체(Blob) 그래디언트 객체들
+        ------------------------------------- */
+        .blob {
+            position: absolute;
+            mix-blend-mode: hard-light;
+            opacity: 0.7;
+        }
+
+        /* 좌측 고정 유체: 비대칭 찌그러짐 + 회전 애니메이션 */
+        .g-liquid-left {
+            background: linear-gradient(135deg, rgba(242, 98, 0, 0.9), rgba(180, 40, 0, 0.6));
+            width: 65vw; height: 65vw;
+            top: -10%; left: -20%;
+            animation: morphLeft 15s infinite alternate ease-in-out, spin 30s infinite linear;
+        }
+        
+        /* 우측 고정 유체 */
+        .g-liquid-right {
+            background: linear-gradient(135deg, rgba(255, 130, 40, 0.9), rgba(200, 50, 0, 0.5));
+            width: 70vw; height: 70vw;
+            bottom: -20%; right: -25%;
+            animation: morphRight 18s infinite alternate ease-in-out, spinReverse 35s infinite linear;
+        }
+
+        /* 🖱️ 마우스를 따라다니는 반응형 유체 (복구됨!) */
+        .interactive {
+            position: absolute;
+            background: radial-gradient(circle at center, rgba(255, 150, 60, 1) 0%, rgba(255, 150, 60, 0) 50%);
+            width: 35vw; height: 35vw;
+            top: -17.5vw; left: -17.5vw; /* 중앙 정렬을 위해 크기의 절반만큼 당김 */
+            mix-blend-mode: screen;
+            opacity: 0.8;
+            border-radius: 50%;
+        }
+
+        /* 역동적인 비대칭(Morphing) 애니메이션 */
+        @keyframes morphLeft {
+            0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; transform: scale(1); }
+            50% { border-radius: 60% 40% 30% 70% / 50% 60% 40% 50%; transform: scale(1.1); }
+            100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; transform: scale(0.9); }
+        }
+
+        @keyframes morphRight {
+            0% { border-radius: 30% 70% 50% 50% / 50% 40% 60% 50%; transform: scale(1.1); }
+            50% { border-radius: 50% 50% 30% 70% / 40% 60% 50% 40%; transform: scale(0.9); }
+            100% { border-radius: 30% 70% 50% 50% / 50% 40% 60% 50%; transform: scale(1); }
+        }
+
+        /* 천천히 회전하는 애니메이션 추가 (액체 느낌 극대화) */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes spinReverse { 100% { transform: rotate(-360deg); } }
+
+        /* -------------------------------------
+           전면 텍스트 및 로고 UI
+        ------------------------------------- */
+        .content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: #ffffff;
+            text-align: center;
+            pointer-events: none; /* 중요: 마우스 이벤트가 배경으로 뚫고 지나가도록 허용 */
+        }
+
+        /* 로고 스타일 */
+        .main-logo {
+            width: 450px;
+            max-width: 80%;
+            margin-bottom: 25px;
+            filter: drop-shadow(0px 10px 30px rgba(0,0,0,0.8));
+        }
+
+        /* 서브 텍스트 스타일 */
+        .content p {
+            font-size: 1.25rem;
+            color: #eeeeee;
+            font-weight: 300;
+            line-height: 1.7;
+            letter-spacing: -0.5px;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.8);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="content">
+        <img src="moldoo_logo.png" alt="MOLDOO Studio" class="main-logo">
+        <p>당신의 상상력에 유려한 움직임을 더합니다.<br>몰두(MOLDOO)만의 감각적인 크리에이티브 솔루션</p>
+    </div>
+
+    <div class="gradient-bg">
+        <svg>
+            <filter id="goo">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+                <feBlend in="SourceGraphic" in2="goo" />
+            </filter>
+        </svg>
+        <div class="gradients-container">
+            <div class="blob g-liquid-left"></div>
+            <div class="blob g-liquid-right"></div>
+            <div class="interactive"></div> </div>
+    </div>
+
+    <script>
+        const interBubble = document.querySelector('.interactive');
+        let curX = window.innerWidth / 2;
+        let curY = window.innerHeight / 2;
+        let tgX = window.innerWidth / 2;
+        let tgY = window.innerHeight / 2;
+
+        function move() {
+            curX += (tgX - curX) / 20; // 관성(딜레이) 수치
+            curY += (tgY - curY) / 20;
+            interBubble.style.transform = `translate(${Math.round(curX)}px, ${Math.round(curY)}px)`;
+            requestAnimationFrame(move);
+        }
+
+        // 마우스 움직임 감지
+        window.addEventListener('mousemove', (event) => {
+            tgX = event.clientX;
+            tgY = event.clientY;
+        });
+
+        move();
+    </script>
+
+</body>
+</html>
