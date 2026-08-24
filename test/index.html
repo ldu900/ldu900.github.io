@@ -434,7 +434,7 @@
         <section id="about" class="about-section scroll-section">
             
             <div class="spotlight-container" id="spotlightContainer">
-                <div class="svg-wrapper" id="svgWrapper" style="width: max(122vw, 1200px); opacity: 0.9; transform-origin: center top;">
+                <div class="svg-wrapper" id="svgWrapper">
                     <svg id="_레이어_2" data-name="레이어 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2059.02 2342.91"> 
                         <defs> 
                             <style> .cls-1 { fill: url(#_무제_그라디언트_43); } </style> 
@@ -454,8 +454,7 @@
         </section>
 
         <!-- 2. Portfolio -->
-        <!-- 💡 픽스 2: id="port-container" 중복 속성 제거 완료 -->
-        <section id="portfolio" class="portfolio-section section-padding scroll-section view-mode-grid">
+        <section id="portfolio" class="portfolio-section section-padding scroll-section view-mode-grid" id="port-container">
             <div class="section-header">
                 <h2 class="section-title">Portfolio</h2>
                 <div class="category-tabs" id="filter-container">
@@ -563,7 +562,7 @@
         </section>
     </main>
 
-    <!-- 외부 데이터 파일 불러오기 -->
+    <!-- 외부 분리된 데이터 파일 불러오기 -->
     <script src="data.js"></script>
 
     <!-- 핵심 로직 영역 -->
@@ -765,7 +764,7 @@
         renderGlobalScroll();
 
         // ==========================================
-        // 로고 클릭 이벤트 & 이스터에그 (단체사진)
+        // 로고 클릭 이벤트 & 이스터에그 (단체사진 복구)
         // ==========================================
         const targetSequence = ['M', 'O1', 'L', 'D', 'O2', 'O3'];
         let currentSequence = [];
@@ -833,13 +832,12 @@
         });
 
         let currentActiveSection = 'about';
-        // 💡 픽스: 스크롤 영역 감지 정확도를 높여 브라우저/모바일 오류 해결 (threshold: 0.5 적용)
         const observer = new IntersectionObserver((entries) => {
             if (isClickScrolling) return;
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const id = entry.target.getAttribute('id');
-                    if (id && currentActiveSection !== id) {
+                    if (currentActiveSection !== id) {
                         currentActiveSection = id;
                         syncSideSubMenus(id);
                         if (id === 'portfolio' && typeof resetPortfolio === 'function') resetPortfolio();
@@ -847,8 +845,7 @@
                     }
                 }
             });
-        }, { root: null, rootMargin: '0px', threshold: 0.5 });
-        
+        }, { root: null, rootMargin: '-40% 0px -40% 0px', threshold: 0 });
         sections.forEach(section => observer.observe(section));
 
         // ==========================================
