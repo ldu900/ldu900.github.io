@@ -3,169 +3,1054 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOLDOO | Dynamic Liquid Gradient</title>
+    <title>MOLDOO | Creative Studio</title>
+    <!-- 물리 엔진 라이브러리 (Matter.js) 로드 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <style>
-        /* 기본 리셋 및 폰트 */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: rgb(255, 255, 255);
+            --text-color: rgb(17, 17, 17);
+            --accent-color: #ec6300; 
+            --contact-bg: rgba(25, 25, 25, 0.6);
+            --contact-border: rgba(255, 255, 255, 0.05);
+            --input-bg: #1a1a1a;
+            --input-border: #333;
+        }
+
+        /* 자석 스크롤 설정 */
+        html { 
+            scroll-behavior: smooth; 
+            scroll-snap-type: y mandatory;
+        }
+
         body, html {
             width: 100%;
             height: 100%;
-            font-family: 'Helvetica Neue', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
-            background-color: #0e0f0f; /* 브랜드 기본 배경색 */
-            overflow: hidden; /* 스크롤 방지 */
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: clip; 
+            transition: background-color 0.1s, color 0.1s;
         }
 
-        /* -------------------------------------
-           그래디언트 배경 컨테이너
-        ------------------------------------- */
-        .gradient-bg {
-            position: absolute;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            overflow: hidden;
-            z-index: 0;
-            background: #0e0f0f;
+        body.no-scroll { overflow: hidden; }
+
+        /* =========================================
+           [PAGE 1] 메가 로고 오프닝
+        ========================================= */
+        .page-1 {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 9000; background: #0e0f0f; cursor: pointer;
+            -webkit-mask-image: radial-gradient(circle var(--mask-radius, 0px) at var(--mask-x, 50vw) var(--mask-y, 50vh), transparent 95%, black 100%);
+            mask-image: radial-gradient(circle var(--mask-radius, 0px) at var(--mask-x, 50vw) var(--mask-y, 50vh), transparent 95%, black 100%);
+            transition: mask-image 0.1s, -webkit-mask-image 0.1s;
+        }
+        .cover-content { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9001; pointer-events: none; }
+        .physics-logo-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: opacity 0.3s ease; }
+        .letter { position: absolute; top: 0; left: 0; color: var(--accent-color); transform-origin: center center; opacity: 0; }
+        .letter svg { width: 100%; height: 100%; display: block; }
+        .instruction-text {
+            position: absolute; left: 50%; transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.9); font-size: 1.15rem; font-weight: 500; letter-spacing: 1px;
+            opacity: 0; transition: opacity 0.5s ease; animation: pulse 2.5s infinite ease-in-out;
+            background: rgba(0, 0, 0, 0.55); padding: 14px 28px; border-radius: 30px;
+            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15);
+            white-space: nowrap; box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: none;
+        }
+        @keyframes pulse {
+            0% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-4px); }
+            100% { transform: translateX(-50%) translateY(0); }
         }
 
-        /* 쫀득한 유체(Gooey) 효과를 위한 SVG 필터 */
-        svg { display: none; }
-
-        .gradients-container {
-            filter: url(#goo) blur(30px); /* 블러를 살짝 줄여 형태를 더 역동적으로 유지 */
-            width: 100%;
-            height: 100%;
+        /* =========================================
+           글로벌 고정 UI (로고 & 좌측 메뉴)
+        ========================================= */
+        .logo-wrapper {
+            position: fixed; top: 50px; left: 50px; z-index: 150;
+            transition: transform 0.3s ease, top 0.3s ease, left 0.3s ease;
         }
+        .sidebar-logo { display: flex; flex-direction: column; gap: 4px; color: var(--text-color); cursor: pointer; transition: color 0.3s ease; }
+        .sidebar-logo-row { display: flex; gap: 4px; height: 34px; }
+        .side-letter { height: 100%; transition: transform 0.1s ease, color 0.2s ease; }
+        .side-letter svg { height: 100%; width: auto; display: block; }
+        .side-letter:active { transform: scale(0.85); color: #ffd6b8; filter: drop-shadow(0 0 8px rgba(236, 99, 0, 0.8)); }
 
-        /* -------------------------------------
-           액체(Blob) 그래디언트 객체들
-        ------------------------------------- */
-        .blob {
-            position: absolute;
-            mix-blend-mode: hard-light;
-            opacity: 0.7;
+        .menu-wrapper {
+            position: fixed; top: 160px; left: 50px; z-index: 150;
+            transition: transform 0.3s ease, top 0.3s ease, left 0.3s ease;
         }
+        .floating-menu { display: flex; flex-direction: column; align-items: flex-start; }
+        .menu-list { display: flex; flex-direction: column; gap: 15px; width: 100%; list-style: none; }
+        
+        .nav-item { display: flex; flex-direction: column; width: 100%; }
+        .nav-link {
+            position: relative; text-decoration: none; color: #888888;
+            font-size: 1.15rem; font-weight: 600; padding-left: 20px; 
+            transition: font-weight 0.2s ease, color 0.2s ease; display: flex; align-items: center; cursor: pointer;
+        }
+        .active-dot {
+            position: absolute; left: 0; width: 8px; height: 8px;
+            background-color: var(--accent-color); border-radius: 50%;
+            opacity: 0; transform: scale(0); transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .nav-link.active { color: var(--text-color); font-weight: 800; }
+        .nav-link.active .active-dot { opacity: 1; transform: scale(1); }
+        .nav-link:hover { color: var(--accent-color); }
 
-        /* 좌측 고정 유체: 비대칭 찌그러짐 + 회전 애니메이션 */
-        .g-liquid-left {
-            background: linear-gradient(135deg, rgba(242, 98, 0, 0.9), rgba(180, 40, 0, 0.6));
-            width: 65vw; height: 65vw;
-            top: -10%; left: -20%;
-            animation: morphLeft 15s infinite alternate ease-in-out, spin 30s infinite linear;
+        .sub-menu {
+            display: flex; flex-direction: column; gap: 10px; margin-top: 0; padding-left: 20px;
+            max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.4s ease, opacity 0.4s ease, margin 0.4s ease;
+        }
+        .nav-link.active + .sub-menu { max-height: 300px; opacity: 1; margin-top: 15px; }
+        .sub-link {
+            background: none; border: none; color: #888; text-align: left; cursor: pointer; 
+            font-size: 0.95rem; font-family: inherit; font-weight: 400; transition: color 0.2s; white-space: nowrap;
+        }
+        .sub-link:hover, .sub-link.active { color: var(--accent-color); font-weight: 600; }
+
+        /* =========================================
+           [SECTION 1] About Us (Spotlight Light)
+        ========================================= */
+        .scroll-section { scroll-snap-align: start; scroll-snap-stop: always; height: 100vh; width: 100%; }
+        .about-section { position: relative; z-index: 10; overflow: visible; }
+        
+        .spotlight-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;
+            display: flex; align-items: flex-start; justify-content: center;
+            opacity: 1; will-change: opacity, transform; transition: opacity 0.3s ease;
         }
         
-        /* 우측 고정 유체 */
-        .g-liquid-right {
-            background: linear-gradient(135deg, rgba(255, 130, 40, 0.9), rgba(200, 50, 0, 0.5));
-            width: 70vw; height: 70vw;
-            bottom: -20%; right: -25%;
-            animation: morphRight 18s infinite alternate ease-in-out, spinReverse 35s infinite linear;
+        .svg-wrapper {
+            width: max(122vw, 1200px);
+            flex-shrink: 0; 
+            opacity: 0.9;
+            transform-origin: center top;
+            will-change: transform;
+        }
+        
+        .svg-wrapper svg { width: 100%; height: auto; display: block; }
+        
+        .main-title {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: clamp(1.6rem, 3.2vw, 2.4rem); font-weight: 400 !important; 
+            color: #ffffff !important; letter-spacing: -0.5px; white-space: nowrap; 
+            z-index: 10; will-change: transform, opacity; text-shadow: none !important;
         }
 
-        /* 🖱️ 마우스를 따라다니는 반응형 유체 (복구됨!) */
-        .interactive {
-            position: absolute;
-            background: radial-gradient(circle at center, rgba(255, 150, 60, 1) 0%, rgba(255, 150, 60, 0) 50%);
-            width: 35vw; height: 35vw;
-            top: -17.5vw; left: -17.5vw; /* 중앙 정렬을 위해 크기의 절반만큼 당김 */
-            mix-blend-mode: screen;
-            opacity: 0.8;
-            border-radius: 50%;
+        /* =========================================
+           [SECTION 2 & 3] 표준 섹션 헤더 (타이틀 + 탭)
+        ========================================= */
+        .section-padding { padding: 40px 40px 40px 260px; display: flex; flex-direction: column; position: relative; }
+        .section-header { display: flex; align-items: baseline; gap: 30px; margin-bottom: 24px; flex-wrap: wrap; z-index: 110; position: relative; }
+        .section-title { font-size: clamp(2.2rem, 3vw, 2.5rem); font-weight: 700; color: var(--text-color); letter-spacing: -0.5px; }
+        
+        .category-tabs { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+        .category-tab {
+            background: transparent; border: none; padding: 0; color: var(--text-color); opacity: 0.4; 
+            cursor: pointer; font-weight: 400; font-size: 1.05rem; transition: all 0.3s ease; font-family: inherit;
         }
+        .category-tab.active, .category-tab:hover { color: var(--accent-color); opacity: 1; font-weight: 400; }
 
-        /* 역동적인 비대칭(Morphing) 애니메이션 */
-        @keyframes morphLeft {
-            0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; transform: scale(1); }
-            50% { border-radius: 60% 40% 30% 70% / 50% 60% 40% 50%; transform: scale(1.1); }
-            100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; transform: scale(0.9); }
-        }
+        /* =========================================
+           [SECTION 2] Portfolio Grid & Detail
+        ========================================= */
+        .portfolio-section { background-color: transparent; z-index: 20; overflow: hidden; }
+        
+        .view-container { flex: 1; position: relative; min-height: 0; pointer-events: auto; display: flex; flex-direction: column; justify-content: center; }
+        .grid-view-wrapper { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 5; opacity: 1; transition: opacity 0.4s ease; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding-top: 10px;}
+        .grid-view { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px 20px; width: 100%; align-content: center; }
+        
+        .pagination { display: flex; justify-content: center; gap: 10px; margin-top: auto; padding-top: 20px; z-index: 20; }
+        .page-num { background: transparent; color: var(--text-color); border: 1px solid rgba(150,150,150,0.3); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; font-weight: 600; font-size: 0.9rem; }
+        .page-num.active, .page-num:hover { background: var(--accent-color); border-color: var(--accent-color); color: #fff; transform: scale(1.1); }
 
-        @keyframes morphRight {
-            0% { border-radius: 30% 70% 50% 50% / 50% 40% 60% 50%; transform: scale(1.1); }
-            50% { border-radius: 50% 50% 30% 70% / 40% 60% 50% 40%; transform: scale(0.9); }
-            100% { border-radius: 30% 70% 50% 50% / 50% 40% 60% 50%; transform: scale(1); }
-        }
+        .grid-item-wrapper { display: flex; flex-direction: column; gap: 12px; cursor: pointer; scroll-snap-align: start; }
+        .grid-item { position: relative; border-radius: 16px; overflow: hidden; background: #111; transform-origin: center center; transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s; padding-bottom: 56.25%; }
+        .grid-item-wrapper:hover .grid-item { transform: scale(1.02); box-shadow: 0 10px 30px rgba(236, 99, 0, 0.3); z-index: 10; }
+        .grid-item img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: filter 0.3s; }
+        .grid-item-wrapper:hover .grid-item img { filter: brightness(1.1); }
+        .grid-item-title { font-size: clamp(0.95rem, 1.5vw, 1.1rem); font-weight: 700; color: var(--text-color); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: color 0.3s ease; }
+        .grid-item-wrapper:hover .grid-item-title { color: var(--accent-color); }
 
-        /* 천천히 회전하는 애니메이션 추가 (액체 느낌 극대화) */
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes spinReverse { 100% { transform: rotate(-360deg); } }
+        .detail-view { display: flex; gap: 24px; width: 100%; height: 100%; opacity: 0; pointer-events: none; transform: scale(0.95); transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); position: absolute; top: 0; left: 0; z-index: 1; }
+        .view-mode-grid .grid-view-wrapper { opacity: 1; pointer-events: auto; transform: scale(1); z-index: 5; }
+        .view-mode-grid .detail-view { opacity: 0; pointer-events: none; transform: scale(0.95); z-index: 1; }
+        .view-mode-detail .grid-view-wrapper { opacity: 0; pointer-events: none; transform: scale(1.05); z-index: 1; }
+        .view-mode-detail .detail-view { opacity: 1; pointer-events: auto; transform: scale(1); z-index: 5; }
 
-        /* -------------------------------------
-           전면 텍스트 및 로고 UI
-        ------------------------------------- */
-        .content {
+        .detail-view-left { flex: 1; display: flex; align-items: center; justify-content: center; min-width: 0; height: 100%; position: relative; }
+        .video-player-wrapper { position: relative; width: 100%; height: auto; aspect-ratio: 16 / 9; max-height: 100%; background: #000; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.4s; z-index: 2; pointer-events: auto; }
+        .video-player-wrapper iframe { width: 100%; height: 100%; border: none; background-color: #111; pointer-events: auto; }
+        
+        .info-box { width: 380px; background: rgba(25, 25, 25, 0.6); border-radius: 20px; padding: 32px; display: flex; flex-direction: column; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(24px); overflow-y: auto; color: #fff; transform: translateX(20px); transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.6s cubic-bezier(0.77, 0, 0.175, 1); }
+        .view-mode-detail .info-box { transform: translateX(0); }
+        .info-category { color: var(--accent-color); font-size: 0.85rem; font-weight: 700; margin-bottom: 12px; text-transform: uppercase;}
+        .info-title { font-size: 2rem; font-weight: 700; margin-bottom: 16px; line-height: 1.3;}
+        .info-meta { display: flex; gap: 16px; align-items: center; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .meta-item { display: flex; gap: 8px; font-size: 0.9rem; align-items: center;}
+        .meta-label { color: #888; font-weight: 600; }
+        .meta-value { color: #ddd; font-weight: 500; }
+        .meta-divider { width: 1px; height: 12px; background: rgba(255,255,255,0.2); }
+        .info-desc { font-size: 1rem; color: #aaa; line-height: 1.6; white-space: pre-line; margin-bottom: 32px; }
+        
+        .estimate-btn { margin-top: auto; width: 100%; background-color: var(--accent-color); color: #ffffff; border: none; border-radius: 12px; padding: 16px 0; font-size: 1.05rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(236, 99, 0, 0.3); }
+        .estimate-btn:hover { transform: translateY(-2px); background-color: #d15600; box-shadow: 0 6px 20px rgba(236, 99, 0, 0.5); }
+
+        .nav-arrow-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0; height: 100%; display: flex; justify-content: space-between; z-index: 20; pointer-events: none; }
+        .nav-arrow { position: relative; width: 35%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+        .nav-arrow::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 66.66%; pointer-events: auto; z-index: 10; }
+        .nav-arrow.left { background: linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%); justify-content: flex-start; padding-left: 5%; }
+        .nav-arrow.right { background: linear-gradient(to left, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%); justify-content: flex-end; padding-right: 5%; }
+        .nav-arrow:hover { opacity: 1; }
+        .nav-arrow svg { position: relative; z-index: 20; width: 50px; height: 50px; fill: white; transition: transform 0.2s, fill 0.2s; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); pointer-events: none; }
+        .nav-arrow:hover svg { transform: scale(1.2); fill: var(--accent-color); }
+
+        .thumbnail-strip-wrapper { position: relative; transition: opacity 0.3s, transform 0.3s; pointer-events: auto; }
+        .view-mode-grid .thumbnail-strip-wrapper { opacity: 0; pointer-events: none; transform: translateY(20px); height: 0; overflow: hidden; }
+        .view-mode-detail .thumbnail-strip-wrapper { opacity: 1; pointer-events: auto; transform: translateY(0); height: auto; margin-top: 15px; }
+        .thumbnail-strip { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+        .thumbnail-strip::-webkit-scrollbar { display: none; }
+        .thumb-item-wrapper { flex: 0 0 200px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; scroll-snap-align: start; }
+        .thumb-item { width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; opacity: 0.5; transition: 0.2s; border: 2px solid transparent; background-color: #222; position: relative; }
+        .thumb-item-wrapper:hover .thumb-item { opacity: 0.8; transform: translateY(-2px); }
+        .thumb-item-wrapper.active .thumb-item { opacity: 1; border-color: var(--accent-color); box-shadow: 0 4px 15px rgba(236, 99, 0, 0.3); }
+        .thumb-item img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+        .thumb-title-text { font-size: 0.85rem; color: #999; font-weight: 600; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; transition: color 0.2s ease; }
+        .thumb-item-wrapper:hover .thumb-title-text { color: #fff; }
+        .thumb-item-wrapper.active .thumb-title-text { color: var(--accent-color); }
+
+        .slide-out-left { transform: translateX(-150%) scale(0.95); opacity: 0; }
+        .slide-out-right { transform: translateX(150%) scale(0.95); opacity: 0; }
+        .slide-in-from-right { transform: translateX(150%) scale(0.95); opacity: 0; }
+        .slide-in-from-left { transform: translateX(-150%) scale(0.95); opacity: 0; }
+        .slide-center { transform: translateX(0) scale(1); opacity: 1; }
+        .no-transition { transition: none !important; }
+
+        /* =========================================
+           [SECTION 3] Services 
+        ========================================= */
+        .services-section { position: relative; display: flex; flex-direction: column; justify-content: flex-end; z-index: 30; overflow: hidden; }
+        .hero-bgs { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background-color: #0e0f0f; }
+        .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.8s ease-in-out; filter: brightness(0.6) contrast(1.1); will-change: opacity; }
+        .hero-bg.active { opacity: 1; }
+        .hero-gradient { position: absolute; bottom: 0; left: 0; width: 100%; height: 65vh; background: linear-gradient(to top, var(--bg-color) 10%, transparent 100%); z-index: 1; pointer-events: none; }
+        
+        .hero-content { position: relative; z-index: 10; max-width: 800px; padding-bottom: 40px; padding-right: 40px; }
+        .hero-title { font-size: clamp(3rem, 5vw, 5rem); font-weight: 700; color:var(--text-color); margin-bottom: 20px; letter-spacing: -2px; transition: opacity 0.4s ease, transform 0.4s ease; word-break: keep-all; }
+        .hero-desc { font-size: clamp(1rem, 1.5vw, 1.2rem); color: var(--text-color); opacity: 0.85; line-height: 1.6; word-break: keep-all; max-width: 650px; transition: opacity 0.4s ease, transform 0.4s ease; }
+        
+        .posters-section { position: relative; z-index: 20; width: 100%; padding-bottom: 60px; }
+        .posters-track { display: flex; gap: 26px; overflow-x: auto; padding: 40px 40px 60px 40px; margin-top: -20px; margin-left: -40px; scrollbar-width: none; }
+        .posters-track::-webkit-scrollbar { display: none; }
+        .poster-item { flex: 0 0 clamp(160px, 15vw, 220px); aspect-ratio: 2 / 3; position: relative; border-radius: 12px; overflow: hidden; cursor: pointer; background: #1a1a1a; border: 2px solid transparent; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease, border-color 0.4s ease; }
+        .poster-item:hover { transform: scale(1.08) translateY(-10px); box-shadow: 0 15px 40px rgba(236, 99, 0, 0.6); border-color: rgba(236, 99, 0, 0.8); z-index: 30; }
+        .poster-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: filter 0.5s ease, transform 0.5s ease; pointer-events: none; }
+        .poster-item:hover .poster-img { filter: brightness(1.1); transform: scale(1.05); }
+        .poster-overlay { position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 50%, transparent 100%); display: flex; align-items: flex-end; padding: 20px; pointer-events: none; }
+        .poster-title { font-size: clamp(1.2rem, 2vw, 1.96rem); font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: -0.5px; transition: color 0.3s ease; }
+        .poster-item:hover .poster-title { color: var(--accent-color); }
+
+        /* =========================================
+           [SECTION 4] Contact Form & Footer
+        ========================================= */
+        .contact-section { 
             position: relative;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            color: #ffffff;
-            text-align: center;
-            pointer-events: none; /* 중요: 마우스 이벤트가 배경으로 뚫고 지나가도록 허용 */
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            z-index: 40; padding: 80px 40px 100px 280px; transition: background-color 0.3s; overflow: hidden;
+        }
+        .contact-wrapper {
+            width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 30px; margin: 0 auto;
+        }
+        .contact-container { 
+            width: 100%; background: var(--contact-bg); padding: 45px 50px; border-radius: 24px; 
+            border: 1px solid var(--contact-border); backdrop-filter: blur(20px); 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.15); transition: background 0.3s, border-color 0.3s; 
+        }
+        .contact-title { font-size: clamp(2.2rem, 4vw, 3rem); font-weight: 700; color: var(--text-color); margin-bottom: 8px; transition: color 0.3s; }
+        .contact-desc { font-size: 1.05rem; color: var(--text-color); opacity: 0.7; margin-bottom: 30px; transition: color 0.3s; }
+        .contact-form { display: flex; flex-direction: column; gap: 18px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .contact-form label { font-size: 0.9rem; font-weight: 600; color: var(--text-color); }
+        .contact-form input, .contact-form select, .contact-form textarea { width: 100%; padding: 14px 18px; font-size: 1rem; color: var(--text-color); background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 12px; outline: none; transition: border-color 0.3s, background 0.3s, color 0.3s; font-family: inherit; }
+        .contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { border-color: var(--accent-color); }
+        .contact-form textarea { resize: vertical; min-height: 100px; }
+        #referenceLink { color: var(--accent-color); font-weight: 600; }
+        .contact-submit { margin-top: 5px; background: var(--accent-color); color: #fff; border: none; padding: 16px; border-radius: 12px; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(236, 99, 0, 0.3); }
+        .contact-submit:hover { transform: translateY(-3px); background: #d15600; box-shadow: 0 8px 25px rgba(236, 99, 0, 0.5); }
+
+        .footer-info {
+            position: absolute; bottom: 20px; left: 280px; right: 0;
+            display: flex; justify-content: center; align-items: center; flex-wrap: nowrap; gap: 14px;
+            color: var(--text-color); opacity: 0.35; font-size: 0.75rem; letter-spacing: 0.3px;
+            transition: color 0.3s; pointer-events: none; white-space: nowrap;
+        }
+        .footer-info span { display: inline-flex; align-items: center; }
+        .footer-info span:not(:last-child)::after { content: "|"; opacity: 0.4; margin-left: 14px; }
+
+        /* =========================================
+           [OVERLAY] 이스터에그 (단체사진)
+        ========================================= */
+        #teamOverlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(14, 15, 15, 0.95); z-index: 9999;
+            display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.5s ease;
+            backdrop-filter: blur(15px);
+        }
+        .close-team {
+            position: absolute; top: 40px; right: 40px; background: none; border: none;
+            color: #fff; font-size: 3rem; font-weight: 300; cursor: pointer; transition: color 0.3s ease;
+        }
+        .close-team:hover { color: var(--accent-color); }
+        .team-image { width: 80vw; max-width: 800px; aspect-ratio: 16/9; object-fit: cover; border-radius: 20px; box-shadow: 0 20px 50px rgba(236, 99, 0, 0.4); transform: scale(0.8); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* =========================================
+           📱 [모바일 대응 반응형 CSS] 
+        ========================================= */
+        @media (max-width: 1024px) {
+            .logo-wrapper { top: 25px; left: 50%; transform: translateX(-50%) scale(0.52); transform-origin: top center; }
+            
+            .menu-wrapper { top: 80px; left: 50%; transform: translateX(-50%); width: 100%; padding: 0 20px; }
+            .menu-list { flex-direction: row; justify-content: center; gap: 30px; flex-wrap: wrap; }
+            .nav-item { width: auto; }
+            .nav-link { font-size: 0.95rem; padding-left: 16px; padding-bottom: 0; }
+            .nav-link .active-dot { top: auto; bottom: auto; left: 0; transform: scale(0); }
+            .nav-link.active .active-dot { transform: scale(1); }
+            .sub-menu { display: none !important; }
+
+            .spotlight-container {
+                align-items: flex-start;
+                padding-top: 105px; 
+            }
+            .svg-wrapper { width: max(250vw, 1000px); }
+            
+            .main-title { top: 35%; }
+
+            .section-padding { padding: 140px 20px 20px 20px; }
+            .grid-view { grid-template-columns: repeat(2, 1fr); } 
+            
+            .detail-view { flex-direction: column; overflow-y: auto; justify-content: flex-start; align-items: center; padding-bottom: 20px; }
+            .detail-view-left { width: 100%; height: auto; flex: none; flex-shrink: 0; margin-bottom: 15px; }
+            .video-player-wrapper { aspect-ratio: 16/9; max-height: none; }
+            .info-box { width: 100%; padding: 16px; transform: translateY(0); max-height: none; margin-top: 0; border-radius: 12px; flex-shrink: 0; }
+            .info-title { font-size: 1.25rem; margin-bottom: 6px; }
+            .info-category { font-size: 0.8rem; margin-bottom: 6px; }
+            .info-meta { margin-bottom: 10px; padding-bottom: 10px; font-size: 0.85rem; }
+            .info-desc { font-size: 0.9rem; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
+            .estimate-btn { padding: 12px 0; font-size: 1rem; }
+            .view-mode-detail .thumbnail-strip-wrapper { display: none; }
+            
+            .services-section { justify-content: center; padding-top: 130px; }
+            .hero-content { padding-bottom: 15px; }
+            .posters-section { padding-bottom: 10px; }
+            .posters-track { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 0; padding: 0; }
+            .poster-item { flex: 0 0 calc(33.333% - 12px); max-width: calc(33.333% - 12px); aspect-ratio: 2/3; }
+            .poster-title { font-size: 0.85rem; padding: 10px; width: 100%; text-align: center; word-break: keep-all; font-weight: 700; }
+            .poster-overlay { padding: 8px; }
+
+            .contact-section { padding: 120px 20px 60px 20px; }
+            .contact-container { padding: 30px 20px; }
+            
+            .footer-info { left: 0; padding: 0 10px; bottom: 15px; font-size: 0.65rem; gap: 8px; flex-wrap: wrap; white-space: normal; }
+            .footer-info span:not(:last-child)::after { margin-left: 8px; }
         }
 
-        /* 로고 스타일 */
-        .main-logo {
-            width: 450px;
-            max-width: 80%;
-            margin-bottom: 25px;
-            filter: drop-shadow(0px 10px 30px rgba(0,0,0,0.8));
-        }
-
-        /* 서브 텍스트 스타일 */
-        .content p {
-            font-size: 1.25rem;
-            color: #eeeeee;
-            font-weight: 300;
-            line-height: 1.7;
-            letter-spacing: -0.5px;
-            text-shadow: 0 5px 15px rgba(0,0,0,0.8);
+        @media (max-width: 480px) {
+            .logo-wrapper { transform: translateX(-50%) scale(0.44); }
+            .menu-list { gap: 24px; }
+            .nav-link { font-size: 0.85rem; padding-left: 12px; }
+            .section-padding { padding-top: 110px; }
+            .close-team { top: 20px; right: 20px; font-size: 2.5rem; }
+            
+            .spotlight-container { padding-top: 95px; }
+            .main-title { top: 32%; }
         }
     </style>
 </head>
-<body>
+<body class="no-scroll">
 
-    <div class="content">
-        <img src="moldoo_logo.png" alt="MOLDOO Studio" class="main-logo">
-        <p>당신의 상상력에 유려한 움직임을 더합니다.<br>몰두(MOLDOO)만의 감각적인 크리에이티브 솔루션</p>
+    <!-- [PAGE 1] 메가 로고 오프닝 커버 -->
+    <div class="page-1" id="page1">
+        <div class="cover-content">
+            <div class="physics-logo-container" id="logoContainer">
+                <div class="letter" id="letter-M" data-type="rect" data-char="M"><svg viewBox="0 0 424.55 186.72"><polygon fill="currentColor" points="256.56 0 252.75 0 212.19 70.25 171.63 0 161.66 0 0 0 0 186.72 131.07 186.72 131.07 116.46 171.63 186.72 252.75 186.72 293.31 116.46 293.31 186.72 424.55 186.72 424.55 0 256.56 0"/></svg></div>
+                <div class="letter" id="letter-O1" data-type="circle" data-char="O1"><svg viewBox="0 0 186.72 186.72"><circle fill="currentColor" cx="93.36" cy="93.36" r="93.36"/></svg></div>
+                <div class="letter" id="letter-L" data-type="rect" data-char="L"><svg viewBox="0 0 186.72 186.72"><polygon fill="currentColor" points="102.66 89.46 102.66 0 0 0 0 186.72 186.72 186.72 186.72 89.46 102.66 89.46"/></svg></div>
+                <div class="letter" id="letter-D" data-type="rect" data-char="D"><svg viewBox="0 0 424.55 186.72"><path fill="currentColor" d="M416.19,55.63c-5.14-11.05-12.39-20.95-21.56-29.43C376.64,9.55,352.5,0,328.4,0H0v186.72h328.4c12.42,0,24.62-2.4,36.27-7.12,11.26-4.56,21.45-11.08,30.29-19.36,9.09-8.51,16.28-18.44,21.37-29.52,5.45-11.87,8.22-24.47,8.22-37.45s-2.81-25.73-8.36-37.65ZM85.92,106.2v-25.68h21.6v25.68h-21.6ZM335.8,82.68c1.46,1.61,3.91,5.13,3.91,10.6,0,8.66-6.16,14.18-10.41,14.18h-197.43v-28.19h197.43c2.12,0,4.55,1.28,6.49,3.42Z"/></svg></div>
+                <div class="letter" id="letter-O2" data-type="circle" data-char="O2"><svg viewBox="0 0 186.72 186.72"><circle fill="currentColor" cx="93.36" cy="93.36" r="93.36"/></svg></div>
+                <div class="letter" id="letter-O3" data-type="circle" data-char="O3"><svg viewBox="0 0 186.72 186.72"><circle fill="currentColor" cx="93.36" cy="93.36" r="93.36"/></svg></div>
+            </div>
+            <p class="instruction-text" id="instruction">화면 아무곳을 클릭하여 입장하기</p>
+        </div>
     </div>
 
-    <div class="gradient-bg">
-        <svg>
-            <filter id="goo">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="blur" />
-                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
-                <feBlend in="SourceGraphic" in2="goo" />
-            </filter>
-        </svg>
-        <div class="gradients-container">
-            <div class="blob g-liquid-left"></div>
-            <div class="blob g-liquid-right"></div>
-            <div class="interactive"></div> </div>
+    <!-- 좌측 상단 고정 UI (로고, 메뉴) -->
+    <div class="logo-wrapper" id="logoWrapper">
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-row">
+                <div class="side-letter" data-char="M"><svg viewBox="0 0 424.55 186.72"><polygon fill="currentColor" points="256.56 0 252.75 0 212.19 70.25 171.63 0 161.66 0 0 0 0 186.72 131.07 186.72 131.07 116.46 171.63 186.72 252.75 186.72 293.31 116.46 293.31 186.72 424.55 186.72 424.55 0 256.56 0"/></svg></div>
+                <div class="side-letter" data-char="O1"><svg viewBox="0 0 186.72 186.72"><circle fill="currentColor" cx="93.36" cy="93.36" r="93.36"/></svg></div>
+                <div class="side-letter" data-char="L"><svg viewBox="0 0 186.72 186.72"><polygon fill="currentColor" points="102.66 89.46 102.66 0 0 0 0 186.72 186.72 186.72 186.72 89.46 102.66 89.46"/></svg></div>
+            </div>
+            <div class="sidebar-logo-row">
+                <div class="side-letter" data-char="D"><svg viewBox="0 0 424.55 186.72"><path fill="currentColor" d="M416.19,55.63c-5.14-11.05-12.39-20.95-21.56-29.43C376.64,9.55,352.5,0,328.4,0H0v186.72h328.4c12.42,0,24.62-2.4,36.27-7.12,11.26-4.56,21.45-11.08,30.29-19.36,9.09-8.51,16.28-18.44,21.37-29.52,5.45-11.87,8.22-24.47,8.22-37.45s-2.81-25.73-8.36-37.65ZM85.92,106.2v-25.68h21.6v25.68h-21.6ZM335.8,82.68c1.46,1.61,3.91,5.13,3.91,10.6,0,8.66-6.16,14.18-10.41,14.18h-197.43v-28.19h197.43c2.12,0,4.55,1.28,6.49,3.42Z"/></svg></div>
+                <div class="side-letter" data-char="O2"><svg viewBox="0 0 186.72 186.72"><circle fill="currentColor" cx="93.36" cy="93.36" r="93.36"/></svg></div>
+                <div class="side-letter" data-char="O3"><svg viewBox="0 0 186.72 186.72"><circle fill="currentColor" cx="93.36" cy="93.36" r="93.36"/></svg></div>
+            </div>
+        </div>
     </div>
 
+    <!-- 이스터에그 단체사진 오버레이 -->
+    <div id="teamOverlay">
+        <button class="close-team" id="closeTeamBtn">&times;</button>
+        <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800" alt="Team Photo" class="team-image" id="teamImg">
+    </div>
+
+    <div class="menu-wrapper" id="menuWrapper">
+        <nav class="floating-menu">
+            <ul class="menu-list">
+                <li class="nav-item"><a href="#about" class="nav-link active" data-target="about"><span class="active-dot"></span>About Us</a></li>
+                <li class="nav-item">
+                    <a href="#portfolio" class="nav-link" data-target="portfolio"><span class="active-dot"></span>Portfolio</a>
+                    <div class="sub-menu" id="submenu-portfolio"></div>
+                </li>
+                <li class="nav-item">
+                    <a href="#services" class="nav-link" data-target="services"><span class="active-dot"></span>Services</a>
+                    <div class="sub-menu" id="submenu-services"></div>
+                </li>
+                <li class="nav-item"><a href="#contact" class="nav-link" data-target="contact"><span class="active-dot"></span>Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- 메인 컨텐츠 영역 -->
+    <main>
+        <!-- 1. About Us -->
+        <section id="about" class="about-section scroll-section">
+            
+            <div class="spotlight-container" id="spotlightContainer">
+                <div class="svg-wrapper" id="svgWrapper">
+                    <svg id="_레이어_2" data-name="레이어 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2059.02 2342.91"> 
+                        <defs> 
+                            <style> .cls-1 { fill: url(#_무제_그라디언트_43); } </style> 
+                            <radialGradient id="_무제_그라디언트_43" data-name="무제 그라디언트 43" cx="582.64" cy="402.29" fx="1496.65" fy="402.29" r="914.01" gradientTransform="translate(1500.9649 432.7588) rotate(90) scale(1.2678 1.1719)" gradientUnits="userSpaceOnUse"> 
+                                <stop id="gradStop1" offset="0.19" stop-color="#ec6300"></stop> 
+                                <stop offset="1" stop-color="#fff" stop-opacity="0"></stop> 
+                            </radialGradient> 
+                        </defs> 
+                        <g id="_레이어_1-2" data-name="레이어 1"> 
+                            <rect class="cls-1" width="2059.02" height="2342.91" transform="translate(2059.0165 2342.9068) rotate(-180)"></rect> 
+                        </g> 
+                    </svg>
+                </div>
+            </div>
+            
+            <h2 class="main-title" id="mainTitle">몰입의 순간을 디자인하다</h2>
+        </section>
+
+        <!-- 2. Portfolio -->
+        <section id="portfolio" class="portfolio-section section-padding scroll-section view-mode-grid" id="port-container">
+            <div class="section-header">
+                <h2 class="section-title">Portfolio</h2>
+                <div class="category-tabs" id="filter-container">
+                    <!-- JS에서 동적 생성됨 -->
+                </div>
+            </div>
+
+            <div class="view-container">
+                <div class="grid-view-wrapper">
+                    <div class="grid-view" id="grid-view"></div>
+                    <div class="pagination" id="pagination"></div>
+                </div>
+
+                <div class="detail-view">
+                    <div class="detail-view-left">
+                        <div class="video-player-wrapper slide-center" id="video-wrapper">
+                            <div class="nav-arrow-container">
+                                <div class="nav-arrow left" id="nav-prev"><svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg></div>
+                                <div class="nav-arrow right" id="nav-next"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg></div>
+                            </div>
+                            <iframe id="main-player" src="about:blank" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                    <aside class="info-box" id="info-box">
+                        <div class="info-category" id="info-category">Category</div>
+                        <h2 class="info-title" id="info-title">Title</h2>
+                        <div class="info-meta">
+                            <div class="meta-item"><span class="meta-label">Client</span><span class="meta-value" id="info-client">-</span></div>
+                            <div class="meta-divider"></div>
+                            <div class="meta-item"><span class="meta-label">Date</span><span class="meta-value" id="info-date">-</span></div>
+                        </div>
+                        <p class="info-desc" id="info-desc">Desc...</p>
+                        <button class="estimate-btn" id="btn-estimate-ref">이 레퍼런스로 견적 받기</button>
+                    </aside>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Services -->
+        <section id="services" class="services-section section-padding scroll-section">
+            <div class="hero-bgs" id="hero-bgs-container">
+                <!-- JS에서 동적 생성됨 -->
+            </div>
+            <div class="hero-gradient"></div>
+            
+            <div class="hero-content">
+                <h1 class="hero-title" id="hero-title">Our Services</h1>
+                <p class="hero-desc" id="hero-desc">클라이언트의 목적에 부합하는 솔루션을 선택하세요.<br>기획, 촬영, 후반 작업 그리고 디자인까지 몰두 스튜디오가 가장 확실한 답을 제시합니다.</p>
+            </div>
+
+            <div class="posters-section" id="posters-section">
+                <div class="posters-track" id="posters-track">
+                    <!-- JS에서 동적 생성됨 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Contact & Footer -->
+        <section id="contact" class="contact-section scroll-section">
+            <div class="contact-wrapper">
+                <div class="contact-container">
+                    <h2 class="contact-title">Contact Us</h2>
+                    <p class="contact-desc">당신의 프로젝트를 기다립니다. 아래 폼을 통해 편하게 문의해 주세요.</p>
+                    <form action="mailto:contact@moldoo.com" method="POST" enctype="text/plain" class="contact-form" id="contactForm">
+                        <div class="form-group">
+                            <label for="name">이름 / 회사명</label>
+                            <input type="text" id="name" name="Name" placeholder="홍길동 / (주)몰두" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">답변 받을 이메일</label>
+                            <input type="email" id="email" name="Email" placeholder="example@moldoo.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="serviceType">필요한 서비스</label>
+                            <select id="serviceType" name="ServiceType">
+                                <option value="영상 편집">영상 편집</option>
+                                <option value="전문 촬영">전문 촬영</option>
+                                <option value="디자인">디자인 (로고, 명함 등)</option>
+                                <option value="AI 콘텐츠">AI 콘텐츠</option>
+                                <option value="몰두 퀵서비스">몰두 퀵서비스 (Lite)</option>
+                                <option value="기타 문의">기타 문의사항</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="referenceLink">레퍼런스 링크 첨부</label>
+                            <input type="url" id="referenceLink" name="ReferenceLink" placeholder="유튜브 등 참고할 만한 영상 링크 (선택 사항)">
+                        </div>
+                        <div class="form-group">
+                            <label for="message">프로젝트 내용</label>
+                            <textarea id="message" name="Message" placeholder="예산, 일정, 기타 사항 등 프로젝트에 대한 간단한 설명을 남겨주세요." required></textarea>
+                        </div>
+                        <button type="submit" class="contact-submit">의뢰 접수하기</button>
+                    </form>
+                </div>
+            </div>
+            
+            <footer class="footer-info">
+                <span><strong>몰두</strong> | 대표자: 신정은</span>
+                <span>영업소 소재지: 서울시 관악구 남부순환로 1990-3, 102호</span>
+                <span>TEL: 010-4885-0728</span>
+                <span>EMAIL: moldoo.studio@gmail.com</span>
+                <span>사업자등록번호: 7835600892</span>
+                <span>운영 시간: 10:00~18:00 (주말·공휴일 휴무)</span>
+            </footer>
+        </section>
+    </main>
+
+    <!-- 외부 분리된 데이터 파일 불러오기 -->
+    <script src="data.js"></script>
+
+    <!-- 핵심 로직 영역 -->
     <script>
-        const interBubble = document.querySelector('.interactive');
-        let curX = window.innerWidth / 2;
-        let curY = window.innerHeight / 2;
-        let tgX = window.innerWidth / 2;
-        let tgY = window.innerHeight / 2;
+        // ==========================================
+        // 1. Intro Matter.js (오프닝)
+        // ==========================================
+        const page1 = document.getElementById('page1');
+        const logoContainer = document.getElementById('logoContainer');
+        const letters = document.querySelectorAll('.letter');
+        const instruction = document.getElementById('instruction');
+        
+        let maskX = window.innerWidth / 2, maskY = window.innerHeight / 2;
+        let targetX = maskX, targetY = maskY;
+        let maskRadius = 0, targetMaskRadius = 0;
+        let isExpanded = false;
+        let radiusAnimId, syncPhysicsId;
 
-        function move() {
-            curX += (tgX - curX) / 20; // 관성(딜레이) 수치
-            curY += (tgY - curY) / 20;
-            interBubble.style.transform = `translate(${Math.round(curX)}px, ${Math.round(curY)}px)`;
-            requestAnimationFrame(move);
+        const Engine = Matter.Engine, Runner = Matter.Runner, Bodies = Matter.Bodies, Composite = Matter.Composite;
+        const engine = Engine.create(); const world = engine.world;
+        engine.gravity.y = 2; 
+        
+        const runner = Runner.create();
+        const baseHeight = window.innerWidth < 768 ? window.innerWidth * 0.25 : Math.min(512, window.innerWidth * 0.22, window.innerHeight * 0.35);
+        const wideWidth = baseHeight * (424.55 / 186.72); 
+        const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+        const gapX = window.innerWidth < 768 ? 3 : 19.2, lineGapY = window.innerWidth < 768 ? 12 : 24; 
+        const totalRowWidth = wideWidth + baseHeight * 2 + gapX * 2;
+        const rowLeftEdge = cx - totalRowWidth / 2;
+
+        const targetPositions = [
+            { x: rowLeftEdge + wideWidth / 2, y: cy - baseHeight / 2 - lineGapY / 2 }, 
+            { x: rowLeftEdge + wideWidth + gapX + baseHeight / 2, y: cy - baseHeight / 2 - lineGapY / 2 }, 
+            { x: rowLeftEdge + wideWidth + gapX + baseHeight + gapX + baseHeight / 2, y: cy - baseHeight / 2 - lineGapY / 2 }, 
+            { x: rowLeftEdge + wideWidth / 2, y: cy + baseHeight / 2 + lineGapY / 2 }, 
+            { x: rowLeftEdge + wideWidth + gapX + baseHeight / 2, y: cy + baseHeight / 2 + lineGapY / 2 }, 
+            { x: rowLeftEdge + wideWidth + gapX + baseHeight + gapX + baseHeight / 2, y: cy + baseHeight / 2 + lineGapY / 2 }  
+        ];
+
+        const floorY = targetPositions[3].y + baseHeight / 2;
+        const invisibleGround = Bodies.rectangle(cx, floorY + 100, window.innerWidth * 3, 200, { isStatic: true });
+        const leftWall = Bodies.rectangle(cx - totalRowWidth/2 - 100, cy, 200, window.innerHeight * 3, { isStatic: true });
+        const rightWall = Bodies.rectangle(cx + totalRowWidth/2 + 100, cy, 200, window.innerHeight * 3, { isStatic: true });
+        Composite.add(world, [invisibleGround, leftWall, rightWall]);
+        const letterBodies = new Array(6).fill(null);
+
+        function dropLetter(index) {
+            let el = letters[index], type = el.getAttribute('data-type');
+            let width = (index === 0 || index === 3) ? wideWidth : baseHeight;
+            el.style.width = width + 'px'; el.style.height = baseHeight + 'px';
+            
+            let startX = targetPositions[index].x + (Math.random() - 0.5) * 10;
+            let startY = targetPositions[index].y - window.innerHeight; 
+            let startAngle = type === 'circle' ? 0 : (Math.random() - 0.5) * 0.8;
+            let props = { restitution: 0.1, friction: 0.8, density: 0.05, angle: startAngle };
+            
+            let body = type === 'circle' ? Bodies.circle(startX, startY, baseHeight / 2, props) : Bodies.rectangle(startX, startY, width, baseHeight, props);
+            letterBodies[index] = { element: el, body: body };
+            Composite.add(world, body);
+            el.style.opacity = '1';
         }
 
-        // 마우스 움직임 감지
-        window.addEventListener('mousemove', (event) => {
-            tgX = event.clientX;
-            tgY = event.clientY;
+        [0, 1, 2, 3, 4, 5].forEach((idx) => { dropLetter(idx); });
+        Runner.run(runner, engine);
+        let physicsActive = true;
+
+        function syncPhysics() {
+            if (!physicsActive) return;
+            letterBodies.forEach(item => {
+                if(item) item.element.style.transform = `translate(-50%, -50%) translate(${item.body.position.x}px, ${item.body.position.y}px) rotate(${item.body.angle}rad)`;
+            });
+            syncPhysicsId = requestAnimationFrame(syncPhysics);
+        }
+        syncPhysics();
+
+        setTimeout(() => {
+            physicsActive = false;
+            Runner.stop(runner);
+            cancelAnimationFrame(syncPhysicsId);
+            
+            letterBodies.forEach((item) => {
+                if(item) item.element.style.transition = 'transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
+            });
+            setTimeout(() => {
+                letterBodies.forEach((item, i) => {
+                    if(item) item.element.style.transform = `translate(-50%, -50%) translate(${targetPositions[i].x}px, ${targetPositions[i].y}px) rotate(0rad)`;
+                });
+            }, 50);
+            setTimeout(() => {
+                targetMaskRadius = 140; 
+                instruction.style.top = `${targetPositions[3].y + baseHeight / 2 + 70}px`;
+                instruction.style.opacity = '1'; 
+                page1.style.pointerEvents = 'auto';
+            }, 700); 
+        }, 1800);
+
+        window.addEventListener('mousemove', (e) => { targetX = e.clientX; targetY = e.clientY; });
+
+        function animateMaskPosition() {
+            maskX += (targetX - maskX) * 0.15; maskY += (targetY - maskY) * 0.15;
+            page1.style.setProperty('--mask-x', `${maskX}px`); page1.style.setProperty('--mask-y', `${maskY}px`);
+            if (!isExpanded) {
+                maskRadius += (targetMaskRadius - maskRadius) * 0.05;
+                page1.style.setProperty('--mask-radius', `${maskRadius}px`);
+            }
+            radiusAnimId = requestAnimationFrame(animateMaskPosition);
+        }
+        animateMaskPosition(); 
+
+        page1.addEventListener('click', () => {
+            if (isExpanded || targetMaskRadius === 0) return; 
+            isExpanded = true;
+            document.body.classList.remove('no-scroll'); 
+            instruction.style.opacity = '0'; logoContainer.style.opacity = '0'; 
+            
+            let expandVelocity = 4;
+            function expand() {
+                if (!isExpanded) return; 
+                expandVelocity *= 1.2; 
+                maskRadius += expandVelocity; 
+                page1.style.setProperty('--mask-radius', `${maskRadius}px`);
+                
+                if (maskRadius < Math.max(window.innerWidth, window.innerHeight) * 1.5) {
+                    requestAnimationFrame(expand);
+                } else {
+                    page1.style.transition = 'opacity 0.6s ease';
+                    page1.style.opacity = '0';
+                    setTimeout(() => {
+                        page1.style.display = 'none'; 
+                        cancelAnimationFrame(radiusAnimId);
+                        Engine.clear(engine); 
+                        world.bodies.forEach(b => Matter.World.remove(world, b));
+                    }, 600);
+                }
+            }
+            expand();
         });
 
-        move();
-    </script>
+        // ==========================================
+        // 2. 글로벌 색상 연동 및 스포트라이트 조명 제어
+        // ==========================================
+        const root = document.documentElement;
+        const mainTitle = document.getElementById('mainTitle');
+        const spotlight = document.getElementById('spotlightContainer');
+        const svgWrapper = document.getElementById('svgWrapper');
 
+        let titleProgress = 0;
+
+        function renderGlobalScroll() {
+            const windowHeight = window.innerHeight;
+            const aboutRect = document.getElementById('about').getBoundingClientRect();
+            const contactRect = document.getElementById('contact').getBoundingClientRect();
+            
+            let aboutProg = 0;
+            if (aboutRect.top <= 0) aboutProg = Math.max(0, Math.min(1, Math.abs(aboutRect.top) / windowHeight));
+            
+            let contactProg = 0;
+            if (contactRect.top < windowHeight) contactProg = Math.max(0, Math.min(1, (windowHeight - contactRect.top) / windowHeight));
+
+            titleProgress += (aboutProg - titleProgress) * 0.08; 
+
+            let finalBgR, finalBgG, finalBgB, finalTxt;
+            if (contactProg > 0) {
+                finalBgR = Math.round(14 + (255 - 14) * contactProg);
+                finalBgG = Math.round(15 + (255 - 15) * contactProg);
+                finalBgB = Math.round(15 + (255 - 15) * contactProg);
+                finalTxt = Math.round(255 + (17 - 255) * contactProg);
+                
+                root.style.setProperty('--contact-bg', `rgba(240, 240, 240, ${0.1 + (0.8 - 0.1) * contactProg})`);
+                root.style.setProperty('--contact-border', `rgba(0,0,0,0.1)`);
+                root.style.setProperty('--input-bg', `rgba(255, 255, 255, ${contactProg})`);
+                root.style.setProperty('--input-border', `rgba(0,0,0,0.2)`);
+            } else {
+                finalBgR = Math.round(255 + (14 - 255) * aboutProg);
+                finalBgG = Math.round(255 + (15 - 255) * aboutProg);
+                finalBgB = Math.round(255 + (15 - 255) * aboutProg);
+                finalTxt = Math.round(17 + (255 - 17) * aboutProg);
+
+                root.style.setProperty('--contact-bg', `rgba(25, 25, 25, 0.6)`);
+                root.style.setProperty('--contact-border', `rgba(255,255,255,0.05)`);
+                root.style.setProperty('--input-bg', `#1a1a1a`);
+                root.style.setProperty('--input-border', `#333`);
+            }
+
+            root.style.setProperty('--bg-color', `rgb(${finalBgR}, ${finalBgG}, ${finalBgB})`);
+            root.style.setProperty('--text-color', `rgb(${finalTxt}, ${finalTxt}, ${finalTxt})`);
+
+            const textTranslateY = -(titleProgress * windowHeight * 0.5);
+            mainTitle.style.transform = `translate(-50%, calc(-50% + ${textTranslateY}px))`;
+            
+            const baseBlurY = window.innerWidth <= 1024 ? -10 : -53;
+            const blurTranslateY = baseBlurY + (textTranslateY * 0.3);
+            svgWrapper.style.transform = `translate(0px, ${blurTranslateY}px) rotate(0deg) scale(1, 1)`;
+
+            spotlight.style.opacity = Math.max(0, 1 - aboutProg * 1.5);
+
+            requestAnimationFrame(renderGlobalScroll);
+        }
+        renderGlobalScroll();
+
+        // ==========================================
+        // 로고 클릭 이벤트 & 이스터에그 (단체사진 복구)
+        // ==========================================
+        const targetSequence = ['M', 'O1', 'L', 'D', 'O2', 'O3'];
+        let currentSequence = [];
+        const teamOverlay = document.getElementById('teamOverlay');
+        const teamImg = document.getElementById('teamImg');
+
+        document.querySelectorAll('.side-letter').forEach(letter => {
+            letter.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
+
+                const char = letter.getAttribute('data-char');
+                currentSequence.push(char);
+                if (currentSequence.length > 6) currentSequence.shift();
+                
+                if (JSON.stringify(currentSequence) === JSON.stringify(targetSequence)) {
+                    teamOverlay.style.display = 'flex';
+                    setTimeout(() => {
+                        teamOverlay.style.opacity = '1'; 
+                        teamImg.style.transform = 'scale(1)';
+                    }, 50);
+                    currentSequence = []; 
+                }
+            });
+        });
+
+        document.getElementById('closeTeamBtn').addEventListener('click', () => {
+            teamOverlay.style.opacity = '0'; 
+            teamImg.style.transform = 'scale(0.8)';
+            setTimeout(() => { teamOverlay.style.display = 'none'; }, 500);
+        });
+
+        // ==========================================
+        // 네비게이션 스크롤 동기화 & 서브메뉴
+        // ==========================================
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.scroll-section');
+        let isClickScrolling = false;
+
+        const subMenuPort = document.getElementById('submenu-portfolio');
+        const portCategories = ['All', ...new Set(SITE_DATA.portfolio.map(i => i.category))];
+        subMenuPort.innerHTML = portCategories.map((cat, i) => `<button class="sub-link ${i===0?'active':''}" data-filter="${cat}">${cat}</button>`).join('');
+
+        const subMenuServ = document.getElementById('submenu-services');
+        const servCategories = Object.keys(SITE_DATA.services).filter(k => k !== 'default');
+        subMenuServ.innerHTML = servCategories.map(k => `<button class="sub-link" data-target-id="${k}">${SITE_DATA.services[k].title.replace('<br>', ' ')}</button>`).join('');
+
+        function syncSideSubMenus(sectionId) {
+            navLinks.forEach(link => {
+                if (link.getAttribute('data-target') === sectionId) link.classList.add('active');
+                else link.classList.remove('active');
+            });
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault(); 
+                isClickScrolling = true;
+                const targetId = link.getAttribute('data-target');
+                syncSideSubMenus(targetId);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) targetSection.scrollIntoView({ behavior: 'smooth' });
+                setTimeout(() => { isClickScrolling = false; }, 800);
+            });
+        });
+
+        let currentActiveSection = 'about';
+        const observer = new IntersectionObserver((entries) => {
+            if (isClickScrolling) return;
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    if (currentActiveSection !== id) {
+                        currentActiveSection = id;
+                        syncSideSubMenus(id);
+                        if (id === 'portfolio' && typeof resetPortfolio === 'function') resetPortfolio();
+                        if (id === 'services' && typeof resetServices === 'function') resetServices();
+                    }
+                }
+            });
+        }, { root: null, rootMargin: '-40% 0px -40% 0px', threshold: 0 });
+        sections.forEach(section => observer.observe(section));
+
+        // ==========================================
+        // 3. Portfolio (카테고리 탭, 페이지네이션)
+        // ==========================================
+        let resetPortfolio; 
+        (() => {
+            const portData = SITE_DATA.portfolio;
+            const PortDOM = {
+                container: document.getElementById('portfolio'), grid: document.getElementById('grid-view'),
+                player: document.getElementById('main-player'), filterWrap: document.getElementById('filter-container'), 
+                videoWrap: document.getElementById('video-wrapper'), info: document.getElementById('info-box'), 
+                pagination: document.getElementById('pagination'), prev: document.getElementById('nav-prev'), 
+                next: document.getElementById('nav-next'), iCat: document.getElementById('info-category'), 
+                iTitle: document.getElementById('info-title'), iDesc: document.getElementById('info-desc'), 
+                iClient: document.getElementById('info-client'), iDate: document.getElementById('info-date'),
+                estimateBtn: document.getElementById('btn-estimate-ref')
+            };
+
+            let curData = portData, curIdx = 0, isAnim = false;
+            let itemsPerPage = window.innerWidth <= 1024 ? 4 : 6;
+            let curPage = 1;
+
+            window.addEventListener('resize', () => {
+                let newItemsPerPage = window.innerWidth <= 1024 ? 4 : 6;
+                if (newItemsPerPage !== itemsPerPage) {
+                    itemsPerPage = newItemsPerPage;
+                    curPage = 1; renderGrid();
+                }
+            });
+
+            function syncFilters(val) {
+                PortDOM.filterWrap.querySelectorAll('.category-tab').forEach(b => {
+                    if(b.dataset.filter === val) b.classList.add('active'); else b.classList.remove('active');
+                });
+                document.querySelectorAll('#submenu-portfolio .sub-link').forEach(b => {
+                    if(b.dataset.filter === val) b.classList.add('active'); else b.classList.remove('active');
+                });
+            }
+
+            function applyFilter(val) {
+                if(isAnim) return;
+                syncFilters(val);
+                curData = val === 'All' ? portData : portData.filter(i => i.category === val);
+                curPage = 1;
+                
+                if (val === 'All' || PortDOM.container.classList.contains('view-mode-grid')) {
+                    PortDOM.container.classList.remove('view-mode-detail'); PortDOM.container.classList.add('view-mode-grid');
+                    PortDOM.player.src = 'about:blank'; 
+                    renderGrid();
+                } else {
+                    if(curData.length) {
+                        curIdx = 0; 
+                        PortDOM.container.classList.remove('view-mode-grid'); PortDOM.container.classList.add('view-mode-detail');
+                        PortDOM.videoWrap.classList.add('no-transition', 'slide-in-from-right');
+                        setTimeout(() => { PortDOM.videoWrap.classList.remove('no-transition', 'slide-in-from-right'); PortDOM.videoWrap.classList.add('slide-center'); loadVideo(curData[0]); }, 50);
+                    }
+                }
+            }
+
+            function renderFilters() {
+                const categories = ['All', ...new Set(portData.map(item => item.category))];
+                PortDOM.filterWrap.innerHTML = categories.map((cat, i) => `<button class="category-tab ${i===0?'active':''}" data-filter="${cat}">${cat}</button>`).join('');
+                PortDOM.filterWrap.querySelectorAll('.category-tab').forEach(btn => {
+                    btn.addEventListener('click', e => { e.preventDefault(); applyFilter(e.target.dataset.filter); });
+                });
+            }
+
+            document.querySelectorAll('#submenu-portfolio .sub-link').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.preventDefault(); applyFilter(e.target.dataset.filter);
+                    document.getElementById('portfolio').scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+
+            resetPortfolio = () => { applyFilter('All'); };
+
+            function renderGrid() {
+                const start = (curPage - 1) * itemsPerPage;
+                const pageData = curData.slice(start, start + itemsPerPage);
+                
+                PortDOM.grid.innerHTML = pageData.map((item, i) => `
+                    <div class="grid-item-wrapper" data-index="${start + i}">
+                        <div class="grid-item"><img loading="lazy" src="https://img.youtube.com/vi/${item.id}/mqdefault.jpg"></div>
+                        <div class="grid-item-title">${item.title}</div>
+                    </div>`).join('');
+                    
+                renderPagination();
+            }
+
+            function renderPagination() {
+                const totalPages = Math.ceil(curData.length / itemsPerPage);
+                if (totalPages <= 1) { PortDOM.pagination.innerHTML = ''; return; }
+                
+                let html = '';
+                for(let i=1; i<=totalPages; i++) {
+                    html += `<button class="page-num ${i === curPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+                }
+                PortDOM.pagination.innerHTML = html;
+                PortDOM.pagination.querySelectorAll('.page-num').forEach(btn => {
+                    btn.addEventListener('click', (e) => { curPage = parseInt(e.target.dataset.page); renderGrid(); });
+                });
+            }
+
+            function loadVideo(item) {
+                PortDOM.player.src = `https://www.youtube.com/embed/${item.id}?rel=0&autoplay=1&mute=0&controls=1&showinfo=0`;
+                PortDOM.iCat.textContent = item.category; PortDOM.iTitle.textContent = item.title; 
+                PortDOM.iDesc.textContent = item.desc; PortDOM.iClient.textContent = item.client; PortDOM.iDate.textContent = item.date;
+            }
+
+            function slideVid(item, dir) {
+                if(isAnim) return; isAnim = true;
+                PortDOM.videoWrap.classList.remove('slide-center');
+                PortDOM.info.style.transform = 'translateY(15px)'; PortDOM.info.style.opacity = '0';
+                PortDOM.videoWrap.classList.add(dir === 'next' ? 'slide-out-left' : 'slide-out-right');
+
+                setTimeout(() => {
+                    loadVideo(item);
+                    PortDOM.videoWrap.classList.add('no-transition');
+                    PortDOM.videoWrap.classList.remove('slide-out-left', 'slide-out-right');
+                    PortDOM.videoWrap.classList.add(dir === 'next' ? 'slide-in-from-right' : 'slide-in-from-left');
+                    setTimeout(() => {
+                        PortDOM.videoWrap.classList.remove('no-transition', 'slide-in-from-right', 'slide-in-from-left');
+                        PortDOM.videoWrap.classList.add('slide-center');
+                        PortDOM.info.style.transform = 'translateY(0)'; PortDOM.info.style.opacity = '1';
+                        setTimeout(() => isAnim = false, 600);
+                    }, 50);
+                }, 600);
+            }
+
+            PortDOM.grid.addEventListener('click', e => {
+                const t = e.target.closest('.grid-item-wrapper'); if(!t || isAnim) return;
+                curIdx = parseInt(t.dataset.index); 
+                PortDOM.container.classList.remove('view-mode-grid'); PortDOM.container.classList.add('view-mode-detail');
+                loadVideo(curData[curIdx]);
+            });
+
+            PortDOM.prev.addEventListener('click', () => { if(curData.length<=1 || isAnim) return; curIdx = (curIdx - 1 + curData.length) % curData.length; slideVid(curData[curIdx], 'prev'); });
+            PortDOM.next.addEventListener('click', () => { if(curData.length<=1 || isAnim) return; curIdx = (curIdx + 1) % curData.length; slideVid(curData[curIdx], 'next'); });
+
+            PortDOM.estimateBtn.addEventListener('click', () => {
+                const item = curData[curIdx];
+                const linkInput = document.getElementById('referenceLink');
+                linkInput.value = `https://www.youtube.com/watch?v=${item.id}`;
+                document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+            });
+
+            renderFilters(); renderGrid();
+        })();
+
+        // ==========================================
+        // 4. Services (데이터 연동)
+        // ==========================================
+        let resetServices;
+        (() => {
+            const ServData = SITE_DATA.services;
+            const ServDOM = {
+                title: document.getElementById('hero-title'), desc: document.getElementById('hero-desc'),
+                area: document.getElementById('posters-section'), track: document.getElementById('posters-track'),
+                bgsContainer: document.getElementById('hero-bgs-container')
+            };
+            
+            let bgsHTML = ''; let postersHTML = '';
+            Object.keys(ServData).forEach(key => {
+                const d = ServData[key];
+                bgsHTML += `<img id="bg-${key}" src="${d.bgImg}" class="hero-bg ${key==='default'?'active':''}" loading="lazy">`;
+                if (key !== 'default') {
+                    postersHTML += `<div class="poster-item" data-id="${key}"><img loading="lazy" src="${d.posterImg}" class="poster-img"><div class="poster-overlay"><div class="poster-title">${d.title.replace('<br>', ' ')}</div></div></div>`;
+                }
+            });
+            ServDOM.bgsContainer.innerHTML = bgsHTML; ServDOM.track.innerHTML = postersHTML;
+
+            let curState = 'default';
+            
+            function changeState(id) {
+                if (curState === id) return; curState = id;
+                const d = ServData[id];
+                document.querySelectorAll('.hero-bg').forEach(bg => bg.classList.remove('active'));
+                const activeBg = document.getElementById(`bg-${id}`); if (activeBg) activeBg.classList.add('active');
+
+                document.querySelectorAll('#submenu-services .sub-link').forEach(b => {
+                    if(b.dataset.targetId === id) b.classList.add('active'); else b.classList.remove('active');
+                });
+
+                ServDOM.title.style.opacity = '0'; ServDOM.title.style.transform = 'translateY(10px)'; ServDOM.desc.style.opacity = '0'; ServDOM.desc.style.transform = 'translateY(10px)';
+                setTimeout(() => {
+                    ServDOM.title.innerHTML = d.title; ServDOM.desc.innerHTML = d.desc;
+                    ServDOM.title.style.opacity = '1'; ServDOM.title.style.transform = 'translateY(0)';
+                    ServDOM.desc.style.opacity = '1'; ServDOM.desc.style.transform = 'translateY(0)';
+                }, 300); 
+            }
+
+            ServDOM.track.addEventListener('mouseover', e => { const t = e.target.closest('.poster-item'); if (t) changeState(t.dataset.id); });
+            ServDOM.area.addEventListener('mouseleave', () => changeState('default'));
+
+            document.querySelectorAll('#submenu-services .sub-link').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.preventDefault(); 
+                    changeState(e.target.dataset.targetId);
+                    document.getElementById('services').scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+
+            resetServices = () => { changeState('default'); };
+        })();
+    </script>
 </body>
 </html>
