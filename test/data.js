@@ -7,67 +7,11 @@ const SITE_DATA = {
     "portfolio": [
         {
             "id": "d21eQU9Mttc",
-            "category": "Animation",
-            "title": "2026 Cinematic Showreel - Cyberpunk",
-            "desc": "역동적인 움직임을 사이버펑크 아트로 재해석했습니다.",
+            "category": "Portfolio",
+            "title": "포트폴리오 영상 1번",
             "client": "MOLDOO",
-            "date": "2026. 05"
-        },
-        {
-            "id": "d21eQU9Mttc",
-            "category": "Product Film",
-            "title": "Tech Gadget Commercial",
-            "desc": "제품의 미세한 질감과 소재의 디테일을 완벽하게 살려낸 필름.",
-            "client": "Samsung",
-            "date": "2026. 03"
-        },
-        {
-            "id": "d21eQU9Mttc",
-            "category": "Wedding",
-            "title": "A Walk to Remember",
-            "desc": "두 사람의 아름다운 순간을 한 편의 영화처럼 담아낸 시네마.",
-            "client": "Private",
-            "date": "2025. 11"
-        },
-        {
-            "id": "d21eQU9Mttc",
-            "category": "Animation",
-            "title": "Abstract Typography Motion",
-            "desc": "텍스트와 그래픽이 결합된 타이포그래피 모션 작업물입니다.",
-            "client": "Hyundai",
-            "date": "2025. 08"
-        },
-        {
-            "id": "d21eQU9Mttc",
-            "category": "Product Film",
-            "title": "Beauty of Nature",
-            "desc": "뷰티 브랜드의 아이덴티티를 시각화한 캠페인 영상.",
-            "client": "Amorepacific",
-            "date": "2025. 04"
-        },
-        {
-            "id": "d21eQU9Mttc",
-            "category": "Wedding",
-            "title": "Romantic Wedding Highlight",
-            "desc": "최고의 순간을 담은 프리미엄 웨딩 하이라이트 영상.",
-            "client": "Private",
-            "date": "2025. 02"
-        },
-        {
-            "id": "d21eQU9Mttc",
-            "category": "Product Film",
-            "title": "Dynamic Sports Gear",
-            "desc": "스포티한 감각을 극대화한 스포츠 제품 홍보 필름.",
-            "client": "Nike",
-            "date": "2025. 01"
-        },
-        {
-            "id": "d21eQU9Mttc",
-            "category": "Animation",
-            "title": "3D Character Intro",
-            "desc": "브랜드 캐릭터를 활용한 3D 인트로 영상 및 모션그래픽.",
-            "client": "MOLDOO",
-            "date": "2024. 12"
+            "date": "2024. 12",
+            "desc": "몰두 포트폴리오 영상입니다."
         }
     ],
     "services": {
