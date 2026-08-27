@@ -6,20 +6,12 @@
 const SITE_DATA = {
     "portfolio": [
         {
-            "id": "xrfzs9-UkZM",
-            "category": "Interview",
-            "title": "별별직업: 3D 아티스트",
-            "client": "MOLDOO",
-            "date": "2025.12",
-            "desc": "자체 제작 인터뷰 콘텐츠 입니다.<br>- 모션 인트로 범퍼 및 자막 포함"
-        },
-        {
             "id": "d21eQU9Mttc",
-            "category": "Portfolio",
-            "title": "포트폴리오 영상 1번",
+            "category": "포트폴리오",
+            "title": "MOLDOO｜예능 편집 포트폴리오",
             "client": "MOLDOO",
-            "date": "2024. 12",
-            "desc": "몰두 포트폴리오 영상입니다."
+            "date": "25.09",
+            "desc": "유튜브용 편집을 보여주는 포트폴리오 영상입니다.<br><br>[편집 내용]<br>-속도감 있는 편집<br>-다양한 자막 스타일<br>-컬러그레이딩<br>-SFX "
         }
     ],
     "services": {
@@ -37,14 +29,14 @@ const SITE_DATA = {
         "edit": {
             "title": "영상 편집",
             "desc": "유튜브 스타일의 빠른 호흡부터 고급스러운 시네마틱 컬러그레이딩까지. 영상의 목적과 타겟에 맞춘 트렌디한 편집으로 시각적 완성도를 극대화합니다.",
-            "bgImg": "https://images.unsplash.com/photo-1623567934633-d6152efb0bb9?q=80&w=1920",
-            "posterImg": "https://images.unsplash.com/photo-1623567934633-d6152efb0bb9?q=80&w=600"
+            "bgImg": "https://moldoo.info/assets/Services/VideoEdit.jpg",
+            "posterImg": "https://moldoo.info/assets/Services/VideoEdit.jpg"
         },
         "design": {
             "title": "디자인",
             "desc": "로고, 명함, 포스터, 웹배너 등 브랜드의 첫인상을 결정짓는 시각적 요소들을 감각적이고 일관된 아이덴티티로 디자인합니다.",
             "bgImg": "https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=1920",
-            "posterImg": "https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=600"
+            "posterImg": "https://moldoo.info/assets/Services/thumb_Design.jpg"
         },
         "ai": {
             "title": "AI 콘텐츠",
