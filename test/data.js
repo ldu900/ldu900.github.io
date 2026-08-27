@@ -6,7 +6,7 @@
 const SITE_DATA = {
     "portfolio": [
         {
-            "id": "xrfzs9-UkZM&t=18s",
+            "id": "xrfzs9-UkZM",
             "category": "Interview",
             "title": "별별직업: 3D 아티스트",
             "client": "MOLDOO",
