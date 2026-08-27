@@ -113,7 +113,6 @@
         }
         .sub-link:hover, .sub-link.active { color: var(--accent-color); font-weight: 600; }
 
-        /* 모바일 헤더용 흰색 배경 (Contact 진입 시 등장) */
         .mobile-header-bg { display: none; }
 
         /* =========================================
@@ -189,7 +188,6 @@
         
         .info-box { width: 380px; background: rgba(25, 25, 25, 0.6); border-radius: 20px; padding: 32px; display: flex; flex-direction: column; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(24px); overflow-y: auto; color: #fff; transform: translateX(20px); transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.6s cubic-bezier(0.77, 0, 0.175, 1); position: relative; }
         
-        /* 💡 추가: 닫기 버튼 */
         .btn-close-detail {
             position: absolute; top: 20px; right: 20px; width: 32px; height: 32px;
             background: rgba(255,255,255,0.1); border: none; border-radius: 50%;
@@ -221,7 +219,6 @@
         .nav-arrow svg { position: relative; z-index: 20; width: 50px; height: 50px; fill: white; transition: transform 0.2s, fill 0.2s; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); pointer-events: none; }
         .nav-arrow:hover svg { transform: scale(1.2); fill: var(--accent-color); }
 
-        /* 💡 수정: 썸네일 스트립 항상 표시 구조 */
         .thumbnail-strip-wrapper { position: relative; transition: opacity 0.3s, transform 0.3s; pointer-events: auto; width: 100%; margin-top: 20px; }
         .view-mode-grid .thumbnail-strip-wrapper { opacity: 0; pointer-events: none; transform: translateY(20px); height: 0; overflow: hidden; margin-top: 0; }
         .view-mode-detail .thumbnail-strip-wrapper { opacity: 1; pointer-events: auto; transform: translateY(0); height: auto; }
@@ -246,7 +243,6 @@
         /* =========================================
            [SECTION 3] Services 
         ========================================= */
-        /* 💡 픽스: 모바일 오버플로우 방지 */
         .services-section { position: relative; display: flex; flex-direction: column; justify-content: flex-end; z-index: 30; overflow: hidden; }
         .hero-bgs { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background-color: #0e0f0f; }
         .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.8s ease-in-out; filter: brightness(0.6) contrast(1.1); will-change: opacity; }
@@ -323,9 +319,6 @@
         /* =========================================
            📱 [모바일 대응 반응형 CSS] 
         ========================================= */
-        /* 💡 픽스 7: 모바일 헤더용 흰색 분리선 */
-        .mobile-header-bg { display: none; }
-
         @media (max-width: 1024px) {
             .mobile-header-bg {
                 display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100px;
@@ -343,13 +336,13 @@
             .nav-link.active .active-dot { transform: scale(1); }
             .sub-menu { display: none !important; }
 
-            /* 💡 픽스 4, 5: 모바일 뷰 블러 및 텍스트 상향 조절 */
+            /* 💡 픽스 3: 모바일(태블릿) 블러 여백 및 이중 밀림 삭제 */
             .spotlight-container {
                 align-items: flex-start;
-                padding-top: 150px; 
+                padding-top: 0 !important; 
             }
             .svg-wrapper { width: max(250vw, 1000px); }
-            .main-title { top: 50% !important; transform: translate(-50%, -50%) !important; }
+            .main-title { top: 35% !important; transform: translate(-50%, -50%) !important; }
 
             .section-padding { padding: 140px 20px 20px 20px; }
             .grid-view { grid-template-columns: repeat(2, 1fr); } 
@@ -358,7 +351,6 @@
             .detail-view-left { width: 100%; height: auto; flex: none; flex-shrink: 0; margin-bottom: 15px; }
             .video-player-wrapper { aspect-ratio: 16/9; max-height: none; }
             
-            /* 💡 픽스 6: 모바일에서도 썸네일 노출되도록 크기 조절 */
             .thumbnail-strip-wrapper { display: block !important; margin-top: 10px; width: 100%; }
             .thumbnail-strip { gap: 10px; padding-bottom: 5px; }
             .thumb-item-wrapper { flex: 0 0 120px; }
@@ -369,6 +361,7 @@
             .info-meta { margin-bottom: 10px; padding-bottom: 10px; font-size: 0.85rem; }
             .info-desc { font-size: 0.9rem; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
             .estimate-btn { padding: 12px 0; font-size: 1rem; }
+            .view-mode-detail .thumbnail-strip-wrapper { display: block; } /* 💡 픽스 6: 모바일 썸네일 복구 */
             
             .services-section { justify-content: center; padding-top: 130px; }
             .hero-content { padding-bottom: 15px; }
@@ -378,7 +371,7 @@
             .poster-title { font-size: 0.85rem; padding: 10px; width: 100%; text-align: center; word-break: keep-all; font-weight: 700; }
             .poster-overlay { padding: 8px; }
 
-            /* 💡 픽스 7: Contact 페이지 모바일 단독 스크롤 및 배치 최적화 */
+            /* 💡 픽스 5: Contact 페이지 모바일 단독 스크롤 및 배치 최적화 */
             .contact-section { 
                 height: auto !important; min-height: 100dvh; scroll-snap-align: start; 
                 padding: 130px 20px 60px 20px; justify-content: flex-start;
@@ -399,7 +392,9 @@
             .nav-link { font-size: 0.85rem; padding-left: 12px; }
             .section-padding { padding-top: 110px; }
             .close-team { top: 20px; right: 20px; font-size: 2.5rem; }
-            .spotlight-container { padding-top: 130px; }
+            
+            /* 💡 픽스 3: 스마트폰(매우 좁은 가로) 텍스트 상향 동기화 */
+            .main-title { top: 32% !important; }
         }
     </style>
 </head>
@@ -511,7 +506,6 @@
                             </div>
                             <iframe id="main-player" src="about:blank" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                         </div>
-                        <!-- 💡 픽스 6: 하단 썸네일 스트립 추가 (PC, 모바일 공통 노출) -->
                         <div class="thumbnail-strip-wrapper">
                             <div class="thumbnail-strip" id="thumbnail-strip"></div>
                         </div>
@@ -623,14 +617,14 @@
         let isExpanded = false;
         let radiusAnimId;
 
-        // 💡 픽스 1: 모바일에서 JS 오류를 방지하기 위해 로드 시점에서 안전하게 초기화
+        // 💡 픽스 1: 모바일 중심 오차 수정을 위해 getBoundingClientRect로 절대 위치 계산
         window.addEventListener('DOMContentLoaded', () => {
             const Engine = Matter.Engine, Runner = Matter.Runner, Bodies = Matter.Bodies, Composite = Matter.Composite;
             const engine = Engine.create(); const world = engine.world;
             engine.gravity.y = 2; 
             
             const runner = Runner.create();
-            // 화면 렌더링 기준 실제 높이를 가져옴
+            
             const rect = page1.getBoundingClientRect();
             const wWidth = rect.width;
             const wHeight = rect.height;
@@ -687,7 +681,6 @@
             }
             syncPhysics();
 
-            // 💡 픽스 1: 모바일 마스크 렌더링 버그 방지를 위해 초기값을 none으로 설정
             page1.style.webkitMaskImage = 'none';
             page1.style.maskImage = 'none';
 
@@ -704,7 +697,6 @@
                     });
                 }, 50);
                 setTimeout(() => {
-                    // 💡 픽스 2: 모바일은 80px 작은 원형으로 타겟 설정
                     targetMaskRadius = window.innerWidth <= 768 ? 80 : 140; 
                     instruction.style.top = `${targetPositions[3].y + baseHeight / 2 + 70}px`;
                     instruction.style.opacity = '1'; 
@@ -720,13 +712,11 @@
             
             if (!isExpanded) {
                 maskRadius += (targetMaskRadius - maskRadius) * 0.05;
-                // 타겟 설정 이후에만 마스크 이미지 활성화 (사파리 렌더링 버그 방지)
                 if(targetMaskRadius > 0) {
                     page1.style.webkitMaskImage = `radial-gradient(circle ${maskRadius}px at ${maskX}px ${maskY}px, transparent 95%, black 100%)`;
                     page1.style.maskImage = `radial-gradient(circle ${maskRadius}px at ${maskX}px ${maskY}px, transparent 95%, black 100%)`;
                 }
             } else {
-                // 확장 중
                 page1.style.webkitMaskImage = `radial-gradient(circle ${maskRadius}px at ${maskX}px ${maskY}px, transparent 95%, black 100%)`;
                 page1.style.maskImage = `radial-gradient(circle ${maskRadius}px at ${maskX}px ${maskY}px, transparent 95%, black 100%)`;
             }
@@ -796,7 +786,6 @@
                 root.style.setProperty('--input-bg', `rgba(255, 255, 255, ${contactProg})`);
                 root.style.setProperty('--input-border', `rgba(0,0,0,0.2)`);
                 
-                // 💡 픽스 7: 모바일 Contact Us 화면 진입 시 흰색 헤더 배경 활성화
                 if(mobileHeaderBg) mobileHeaderBg.classList.add('active');
             } else {
                 finalBgR = Math.round(255 + (14 - 255) * aboutProg);
@@ -816,11 +805,10 @@
             root.style.setProperty('--text-color', `rgb(${finalTxt}, ${finalTxt}, ${finalTxt})`);
 
             const textTranslateY = -(titleProgress * windowHeight * 0.5);
-            // 💡 픽스 5: 텍스트 위치는 CSS top: 50%가 고정하고 여기서 Y축 이동만 담당합니다.
             mainTitle.style.transform = `translate(-50%, calc(-50% + ${textTranslateY}px))`;
             
-            // 💡 픽스 4: 데스크탑 오프셋(-53px) / 모바일 오프셋(+150px)
-            const baseBlurY = window.innerWidth <= 1024 ? 150 : -53;
+            // 💡 픽스 1: 모바일 오프셋을 크게 올려서 SVG 자체의 여백(빈 공간)을 상쇄시킴 (150px)
+            const baseBlurY = window.innerWidth <= 480 ? 115 : (window.innerWidth <= 1024 ? 125 : -53);
             const blurTranslateY = baseBlurY + (textTranslateY * 0.3);
             svgWrapper.style.transform = `translate(0px, ${blurTranslateY}px) rotate(0deg) scale(1, 1)`;
 
@@ -880,9 +868,6 @@
 
             const servCategories = Object.keys(SITE_DATA.services).filter(k => k !== 'default');
             subMenuServ.innerHTML = servCategories.map(k => `<button class="sub-link" data-target-id="${k}">${SITE_DATA.services[k].title.replace('<br>', ' ')}</button>`).join('');
-        } else {
-            console.error("MOLDOO 오류: 외부 data.js 파일을 불러오지 못했습니다.");
-            alert("data.js 파일이 로드되지 않았습니다. 파일 위치를 확인해 주세요.");
         }
 
         function syncSideSubMenus(sectionId) {
@@ -918,7 +903,7 @@
                     }
                 }
             });
-        }, { root: null, rootMargin: '-40% 0px -40% 0px', threshold: 0 });
+        }, { root: null, rootMargin: '0px', threshold: 0.5 });
 
         sections.forEach(section => observer.observe(section));
 
@@ -940,7 +925,7 @@
                 iClient: document.getElementById('info-client'), iDate: document.getElementById('info-date'),
                 estimateBtn: document.getElementById('btn-estimate-ref'),
                 closeBtn: document.getElementById('btn-close-detail'),
-                thumbStrip: document.getElementById('thumbnail-strip') // 💡 픽스 6: 썸네일 스트립
+                thumbStrip: document.getElementById('thumbnail-strip')
             };
 
             let curData = portData, curIdx = 0, isAnim = false;
@@ -970,19 +955,24 @@
                 curData = val === 'All' ? portData : portData.filter(i => i.category === val);
                 curPage = 1;
                 
-                if (val === 'All' || PortDOM.container.classList.contains('view-mode-grid')) {
-                    PortDOM.container.classList.remove('view-mode-detail'); PortDOM.container.classList.add('view-mode-grid');
-                    PortDOM.player.src = 'about:blank'; 
-                    renderGrid();
-                } else {
-                    if(curData.length) {
+                // 💡 픽스 2: 카테고리 변경 시 바탕의 그리드 뷰를 무조건 먼저 렌더링하도록 강제
+                renderGrid();
+                renderThumbnails(); 
+                
+                if (PortDOM.container.classList.contains('view-mode-detail')) {
+                    if(curData.length > 0) {
                         curIdx = 0; 
-                        PortDOM.container.classList.remove('view-mode-grid'); PortDOM.container.classList.add('view-mode-detail');
                         PortDOM.videoWrap.classList.add('no-transition', 'slide-in-from-right');
                         setTimeout(() => { PortDOM.videoWrap.classList.remove('no-transition', 'slide-in-from-right'); PortDOM.videoWrap.classList.add('slide-center'); loadVideo(curData[0]); }, 50);
+                    } else {
+                        // 카테고리에 영상이 없으면 그리드 뷰로 나감
+                        PortDOM.container.classList.remove('view-mode-detail');
+                        PortDOM.container.classList.add('view-mode-grid');
+                        PortDOM.player.src = 'about:blank';
                     }
+                } else {
+                    PortDOM.player.src = 'about:blank'; 
                 }
-                renderThumbnails(); // 카테고리 바뀔 때 썸네일 리스트도 업데이트
             }
 
             function renderFilters() {
@@ -1029,7 +1019,6 @@
                 });
             }
 
-            // 💡 픽스 6: 하단 다른 영상 썸네일 스트립 렌더링 함수
             function renderThumbnails() {
                 if(!PortDOM.thumbStrip) return;
                 PortDOM.thumbStrip.innerHTML = curData.map((item, i) => `
@@ -1050,7 +1039,6 @@
                 });
             }
 
-            // 💡 썸네일 선택 효과 갱신
             function updateThumbnailActive() {
                 if(!PortDOM.thumbStrip) return;
                 PortDOM.thumbStrip.querySelectorAll('.thumb-item-wrapper').forEach(el => el.classList.remove('active'));
@@ -1098,11 +1086,10 @@
             PortDOM.prev.addEventListener('click', () => { if(curData.length<=1 || isAnim) return; curIdx = (curIdx - 1 + curData.length) % curData.length; slideVid(curData[curIdx], 'prev'); });
             PortDOM.next.addEventListener('click', () => { if(curData.length<=1 || isAnim) return; curIdx = (curIdx + 1) % curData.length; slideVid(curData[curIdx], 'next'); });
 
-            // 💡 픽스 7: 영상 닫기(X) 버튼 기능
             PortDOM.closeBtn.addEventListener('click', () => {
                 PortDOM.container.classList.remove('view-mode-detail');
                 PortDOM.container.classList.add('view-mode-grid');
-                PortDOM.player.src = 'about:blank'; // 영상 소리 정지
+                PortDOM.player.src = 'about:blank'; 
             });
 
             PortDOM.estimateBtn.addEventListener('click', () => {
