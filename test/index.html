@@ -251,7 +251,8 @@
         
         .hero-content { position: relative; z-index: 10; max-width: 800px; padding-bottom: 40px; padding-right: 40px; }
         .hero-title { font-size: clamp(3rem, 5vw, 5rem); font-weight: 700; color:var(--text-color); margin-bottom: 20px; letter-spacing: -2px; transition: opacity 0.4s ease, transform 0.4s ease; word-break: keep-all; }
-        .hero-desc { font-size: clamp(1rem, 1.5vw, 1.2rem); color: var(--text-color); opacity: 0.85; line-height: 1.6; word-break: keep-all; max-width: 650px; transition: opacity 0.4s ease, transform 0.4s ease; }
+        /* 💡 픽스: 텍스트 내용 길이에 따라 높이가 달라져 아래쪽 레이아웃이 요동치는(덜컹거리는) 현상 방지 (min-height) */
+        .hero-desc { font-size: clamp(1rem, 1.5vw, 1.2rem); color: var(--text-color); opacity: 0.85; line-height: 1.6; word-break: keep-all; max-width: 650px; transition: opacity 0.4s ease, transform 0.4s ease; min-height: 5.5em; }
         
         .posters-section { position: relative; z-index: 20; width: 100%; padding-bottom: 60px; }
         .posters-track { display: flex; gap: 26px; overflow-x: auto; padding: 40px 40px 60px 40px; margin-top: -20px; margin-left: -40px; scrollbar-width: none; }
@@ -336,13 +337,13 @@
             .nav-link.active .active-dot { transform: scale(1); }
             .sub-menu { display: none !important; }
 
-            /* 💡 픽스 3: 모바일(태블릿) 블러 여백 및 이중 밀림 삭제 */
             .spotlight-container {
                 align-items: flex-start;
-                padding-top: 0 !important; 
+                padding-top: 105px; 
             }
             .svg-wrapper { width: max(250vw, 1000px); }
-            .main-title { top: 35% !important; transform: translate(-50%, -50%) !important; }
+            
+            .main-title { top: 35%; }
 
             .section-padding { padding: 140px 20px 20px 20px; }
             .grid-view { grid-template-columns: repeat(2, 1fr); } 
@@ -361,17 +362,17 @@
             .info-meta { margin-bottom: 10px; padding-bottom: 10px; font-size: 0.85rem; }
             .info-desc { font-size: 0.9rem; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
             .estimate-btn { padding: 12px 0; font-size: 1rem; }
-            .view-mode-detail .thumbnail-strip-wrapper { display: block; } /* 💡 픽스 6: 모바일 썸네일 복구 */
+            .view-mode-detail .thumbnail-strip-wrapper { display: block; }
             
             .services-section { justify-content: center; padding-top: 130px; }
             .hero-content { padding-bottom: 15px; }
             .posters-section { padding-bottom: 10px; }
-            .posters-track { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 0; padding: 0; }
+            /* 💡 픽스: 모바일 포스터 영역 확대 시 위쪽 클리핑 방지 여백 (margin & padding 조정) */
+            .posters-track { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: -20px 0 0 0; padding: 20px 0 10px 0; }
             .poster-item { flex: 0 0 calc(33.333% - 12px); max-width: calc(33.333% - 12px); aspect-ratio: 2/3; }
             .poster-title { font-size: 0.85rem; padding: 10px; width: 100%; text-align: center; word-break: keep-all; font-weight: 700; }
             .poster-overlay { padding: 8px; }
 
-            /* 💡 픽스 5: Contact 페이지 모바일 단독 스크롤 및 배치 최적화 */
             .contact-section { 
                 height: auto !important; min-height: 100dvh; scroll-snap-align: start; 
                 padding: 130px 20px 60px 20px; justify-content: flex-start;
@@ -393,7 +394,7 @@
             .section-padding { padding-top: 110px; }
             .close-team { top: 20px; right: 20px; font-size: 2.5rem; }
             
-            /* 💡 픽스 3: 스마트폰(매우 좁은 가로) 텍스트 상향 동기화 */
+            .spotlight-container { padding-top: 95px; }
             .main-title { top: 32% !important; }
         }
     </style>
@@ -437,6 +438,8 @@
     <!-- 이스터에그 단체사진 오버레이 -->
     <div id="teamOverlay">
         <button class="close-team" id="closeTeamBtn">&times;</button>
+        <!-- 💡 이스터에그 이미지 교체 부분 💡 -->
+        <!-- 아래의 src="https://..." 부분을 원하시는 파일명(예: team.jpg)으로 바꾸시면 됩니다. -->
         <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800" alt="Team Photo" class="team-image" id="teamImg">
     </div>
 
@@ -511,7 +514,6 @@
                         </div>
                     </div>
                     <aside class="info-box" id="info-box">
-                        <!-- 💡 픽스 7: 영상 디테일 뷰 닫기(X) 버튼 -->
                         <button class="btn-close-detail" id="btn-close-detail" title="그리드 뷰로 돌아가기">
                             <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                         </button>
@@ -617,7 +619,6 @@
         let isExpanded = false;
         let radiusAnimId;
 
-        // 💡 픽스 1: 모바일 중심 오차 수정을 위해 getBoundingClientRect로 절대 위치 계산
         window.addEventListener('DOMContentLoaded', () => {
             const Engine = Matter.Engine, Runner = Matter.Runner, Bodies = Matter.Bodies, Composite = Matter.Composite;
             const engine = Engine.create(); const world = engine.world;
@@ -807,7 +808,6 @@
             const textTranslateY = -(titleProgress * windowHeight * 0.5);
             mainTitle.style.transform = `translate(-50%, calc(-50% + ${textTranslateY}px))`;
             
-            // 💡 픽스 1: 모바일 오프셋을 크게 올려서 SVG 자체의 여백(빈 공간)을 상쇄시킴 (150px)
             const baseBlurY = window.innerWidth <= 480 ? 115 : (window.innerWidth <= 1024 ? 125 : -53);
             const blurTranslateY = baseBlurY + (textTranslateY * 0.3);
             svgWrapper.style.transform = `translate(0px, ${blurTranslateY}px) rotate(0deg) scale(1, 1)`;
@@ -955,7 +955,6 @@
                 curData = val === 'All' ? portData : portData.filter(i => i.category === val);
                 curPage = 1;
                 
-                // 💡 픽스 2: 카테고리 변경 시 바탕의 그리드 뷰를 무조건 먼저 렌더링하도록 강제
                 renderGrid();
                 renderThumbnails(); 
                 
@@ -965,7 +964,6 @@
                         PortDOM.videoWrap.classList.add('no-transition', 'slide-in-from-right');
                         setTimeout(() => { PortDOM.videoWrap.classList.remove('no-transition', 'slide-in-from-right'); PortDOM.videoWrap.classList.add('slide-center'); loadVideo(curData[0]); }, 50);
                     } else {
-                        // 카테고리에 영상이 없으면 그리드 뷰로 나감
                         PortDOM.container.classList.remove('view-mode-detail');
                         PortDOM.container.classList.add('view-mode-grid');
                         PortDOM.player.src = 'about:blank';
