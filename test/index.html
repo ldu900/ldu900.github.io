@@ -4,35 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MOLDOO | Creative Studio</title>
+    <!-- Pretendard 웹폰트 로드 -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <!-- 물리 엔진 라이브러리 (Matter.js) 로드 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <style>
+        /* 글로벌 초기화 및 스케일링 설정 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html { 
+            font-size: 0.62499vw; 
+            scroll-behavior: smooth; 
+            scroll-snap-type: y mandatory;
+        }
+
+        @media (max-width: 1024px) {
+            html { font-size: 16px; } /* 모바일 환경에서는 스케일링을 멈추고 고정 픽셀 사용 */
+        }
+
         :root {
             --bg-color: rgb(255, 255, 255);
             --text-color: rgb(17, 17, 17);
             --accent-color: #ec6300; 
-            --contact-bg: rgba(25, 25, 25, 0.6);
-            --contact-border: rgba(255, 255, 255, 0.05);
-            --input-bg: #1a1a1a;
-            --input-border: #333;
-        }
-
-        /* 자석 스크롤 설정 */
-        html { 
-            scroll-behavior: smooth; 
-            scroll-snap-type: y mandatory;
+            --contact-bg: transparent;
+            --contact-border: transparent;
+            --input-bg: transparent;
+            --input-border: rgba(0, 0, 0, 0.2);
         }
 
         body, html {
             width: 100%;
             height: 100%;
             font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+            font-weight: 400;
             background-color: var(--bg-color);
             color: var(--text-color);
             overflow-x: clip; 
@@ -90,7 +98,8 @@
         .nav-item { display: flex; flex-direction: column; width: 100%; }
         .nav-link {
             position: relative; text-decoration: none; color: #888888;
-            font-size: 1.15rem; font-weight: 600; padding-left: 20px; 
+            font-size: 18px; 
+            font-weight: 500; padding-left: 20px; 
             transition: font-weight 0.2s ease, color 0.2s ease; display: flex; align-items: center; cursor: pointer;
         }
         .active-dot {
@@ -98,7 +107,7 @@
             background-color: var(--accent-color); border-radius: 50%;
             opacity: 0; transform: scale(0); transition: opacity 0.3s ease, transform 0.3s ease;
         }
-        .nav-link.active { color: var(--text-color); font-weight: 800; }
+        .nav-link.active { color: var(--text-color); font-weight: 700; }
         .nav-link.active .active-dot { opacity: 1; transform: scale(1); }
         .nav-link:hover { color: var(--accent-color); }
 
@@ -109,17 +118,39 @@
         .nav-link.active + .sub-menu { max-height: 300px; opacity: 1; margin-top: 15px; }
         .sub-link {
             background: none; border: none; color: #888; text-align: left; cursor: pointer; 
-            font-size: 0.95rem; font-family: inherit; font-weight: 400; transition: color 0.2s; white-space: nowrap;
+            font-size: 15px; 
+            font-family: inherit; font-weight: 500; transition: color 0.2s; white-space: nowrap;
         }
-        .sub-link:hover, .sub-link.active { color: var(--accent-color); font-weight: 600; }
+        .sub-link:hover, .sub-link.active { color: var(--accent-color); font-weight: 700; }
 
         .mobile-header-bg { display: none; }
 
         /* =========================================
-           [SECTION 1] About Us (Spotlight Light)
+           [공통 레이아웃] 
         ========================================= */
         .scroll-section { scroll-snap-align: start; scroll-snap-stop: always; height: 100vh; height: 100dvh; width: 100%; }
-        .about-section { position: relative; z-index: 10; overflow: visible; }
+        
+        .section-padding { 
+            padding: 10rem 2.5rem 3.75rem 2.5rem; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; 
+        }
+        
+        .section-header { 
+            position: absolute; top: 3.125rem; left: 50%; transform: translateX(-50%); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            width: 100%; gap: 1.875rem; z-index: 110; text-align: center; margin-bottom: 0;
+            pointer-events: none;
+        }
+        .section-header > * { pointer-events: auto; }
+        
+        .section-title, .contact-title { 
+            font-size: 2.8rem; font-weight: 600; color: var(--text-color); letter-spacing: -0.5px; line-height: 1.2;
+        }
+
+        /* =========================================
+           [SECTION 1] About Us
+        ========================================= */
+        .about-section { position: relative; z-index: 10; overflow: visible; display: flex; align-items: center; justify-content: center;}
         
         .spotlight-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;
@@ -128,10 +159,9 @@
         }
         
         .svg-wrapper {
-            width: max(122vw, 1200px); flex-shrink: 0; opacity: 0.9;
+            margin-top: -3.3125rem; width: max(122vw, 75rem); flex-shrink: 0; opacity: 0.9;
             transform-origin: center top; will-change: transform;
         }
-        
         .svg-wrapper svg { width: 100%; height: auto; display: block; }
         
         .main-title {
@@ -142,72 +172,60 @@
         }
 
         /* =========================================
-           [SECTION 2 & 3] 표준 섹션 헤더 (타이틀 + 탭)
-        ========================================= */
-        .section-padding { padding: 40px 40px 40px 260px; display: flex; flex-direction: column; position: relative; }
-        .section-header { display: flex; align-items: baseline; gap: 30px; margin-bottom: 24px; flex-wrap: wrap; z-index: 110; position: relative; }
-        .section-title { font-size: clamp(2.2rem, 3vw, 2.5rem); font-weight: 700; color: var(--text-color); letter-spacing: -0.5px; }
-        
-        .category-tabs { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
-        .category-tab {
-            background: transparent; border: none; padding: 0; color: var(--text-color); opacity: 0.4; 
-            cursor: pointer; font-weight: 400; font-size: 1.05rem; transition: all 0.3s ease; font-family: inherit;
-        }
-        .category-tab.active, .category-tab:hover { color: var(--accent-color); opacity: 1; font-weight: 400; }
-
-        /* =========================================
            [SECTION 2] Portfolio Grid & Detail
         ========================================= */
-        .portfolio-section { background-color: transparent; z-index: 20; overflow: hidden; }
-        
-        .view-container { flex: 1; position: relative; min-height: 0; pointer-events: auto; display: flex; flex-direction: column; justify-content: center; }
-        .grid-view-wrapper { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 5; opacity: 1; transition: opacity 0.4s ease; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding-top: 10px;}
-        .grid-view { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px 20px; width: 100%; align-content: center; }
-        
-        .pagination { display: flex; justify-content: center; gap: 10px; margin-top: auto; padding-top: 20px; z-index: 20; }
-        .page-num { background: transparent; color: var(--text-color); border: 1px solid rgba(150,150,150,0.3); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; font-weight: 600; font-size: 0.9rem; }
-        .page-num.active, .page-num:hover { background: var(--accent-color); border-color: var(--accent-color); color: #fff; transform: scale(1.1); }
+        .category-tabs { display: flex; justify-content: center; gap: 2.5rem; align-items: center; width: 100%; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; -ms-overflow-style: none; }
+        .category-tabs::-webkit-scrollbar { display: none; }
+        .category-tab { background: transparent; border: none; padding: 0; color: #ffffff; opacity: 1; cursor: pointer; font-weight: 400; font-size: 1.3rem; transition: all 0.3s ease; font-family: inherit; white-space: nowrap; flex-shrink: 0; }
+        .category-tab.active, .category-tab:hover { color: var(--accent-color); opacity: 1; font-weight: 400; }
 
-        .grid-item-wrapper { display: flex; flex-direction: column; gap: 12px; cursor: pointer; scroll-snap-align: start; }
-        .grid-item { position: relative; border-radius: 16px; overflow: hidden; background: #111; transform-origin: center center; transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s; padding-bottom: 56.25%; }
+        .portfolio-section { background-color: transparent; z-index: 20; overflow: hidden; padding-top: 3.75rem; }
+        
+        .view-container { flex: 1; position: relative; width: 100%; max-width: 87.5rem; min-height: 0; pointer-events: auto; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        
+        .grid-view-wrapper { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 5; opacity: 1; transition: opacity 0.4s ease; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        
+        .grid-view { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.625rem; width: 100%; max-width: 77.5rem; align-content: center; }
+        
+        .pagination { position: absolute; bottom: 5rem; left: 50%; transform: translateX(-50%); display: flex; justify-content: center; gap: 1.25rem; z-index: 20; }
+        .page-num { background: transparent; color: var(--text-color); border: none; border-bottom: 2px solid transparent; width: auto; height: auto; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; font-weight: 700; font-size: 1.3rem; padding-bottom: 4px; border-radius: 0; }
+        .page-num.active, .page-num:hover { background: transparent; border-bottom-color: var(--accent-color); color: var(--accent-color); transform: none; }
+
+        .grid-item-wrapper { display: flex; flex-direction: column; gap: 0; cursor: pointer; scroll-snap-align: start; }
+        .grid-item { position: relative; border-radius: 0; overflow: hidden; background: #111; transform-origin: center center; transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s; padding-bottom: 56.25%; }
         .grid-item-wrapper:hover .grid-item { transform: scale(1.02); box-shadow: 0 10px 30px rgba(236, 99, 0, 0.3); z-index: 10; }
         .grid-item img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: filter 0.3s; }
-        .grid-item-wrapper:hover .grid-item img { filter: brightness(1.1); }
-        .grid-item-title { font-size: clamp(0.95rem, 1.5vw, 1.1rem); font-weight: 700; color: var(--text-color); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: color 0.3s ease; }
-        .grid-item-wrapper:hover .grid-item-title { color: var(--accent-color); }
+        
+        .grid-item-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; padding: 1rem; z-index: 5; }
+        @media (hover: hover) { .grid-item:hover .grid-item-overlay { opacity: 1; } }
+        .grid-item.touch-active .grid-item-overlay { opacity: 1; }
+        .overlay-title { color: #fff; font-size: clamp(0.9rem, 1.5vw, 1.2rem); font-weight: 700; text-align: center; line-height: 1.4; word-break: keep-all; }
 
-        .detail-view { display: flex; gap: 24px; width: 100%; height: 100%; opacity: 0; pointer-events: none; transform: scale(0.95); transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); position: absolute; top: 0; left: 0; z-index: 1; }
+        .detail-view { display: flex; gap: 1.5rem; width: 100%; height: 100%; opacity: 0; pointer-events: none; transform: scale(0.95); transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); position: absolute; top: 0; left: 0; z-index: 1; justify-content: center; }
         .view-mode-grid .grid-view-wrapper { opacity: 1; pointer-events: auto; transform: scale(1); z-index: 5; }
         .view-mode-grid .detail-view { opacity: 0; pointer-events: none; transform: scale(0.95); z-index: 1; }
         .view-mode-detail .grid-view-wrapper { opacity: 0; pointer-events: none; transform: scale(1.05); z-index: 1; }
         .view-mode-detail .detail-view { opacity: 1; pointer-events: auto; transform: scale(1); z-index: 5; }
 
-        .detail-view-left { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; height: 100%; position: relative; }
-        .video-player-wrapper { position: relative; width: 100%; height: auto; aspect-ratio: 16 / 9; max-height: 100%; background: #000; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.4s; z-index: 2; pointer-events: auto; flex-shrink: 0; }
+        .detail-view-left { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; height: 100%; position: relative; max-width: 62.5rem; }
+        .video-player-wrapper { position: relative; width: 100%; height: auto; aspect-ratio: 16 / 9; max-height: 100%; background: #000; border-radius: 0; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.4s; z-index: 2; pointer-events: auto; flex-shrink: 0; }
         .video-player-wrapper iframe { width: 100%; height: 100%; border: none; background-color: #111; pointer-events: auto; }
         
-        .info-box { width: 380px; background: rgba(25, 25, 25, 0.6); border-radius: 20px; padding: 32px; display: flex; flex-direction: column; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(24px); overflow-y: auto; color: #fff; transform: translateX(20px); transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.6s cubic-bezier(0.77, 0, 0.175, 1); position: relative; }
-        
-        .btn-close-detail {
-            position: absolute; top: 20px; right: 20px; width: 32px; height: 32px;
-            background: rgba(255,255,255,0.1); border: none; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.3s; z-index: 100;
-        }
-        .btn-close-detail svg { width: 16px; height: 16px; fill: #fff; transition: 0.3s; }
+        .info-box { width: 23.75rem; background: rgba(25, 25, 25, 0.6); border-radius: 0.75rem; padding: 2rem; display: flex; flex-direction: column; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(24px); overflow-y: auto; color: #fff; transform: translateX(1.25rem); transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.6s cubic-bezier(0.77, 0, 0.175, 1); position: relative; }
+        .btn-close-detail { position: absolute; top: 1.25rem; right: 1.25rem; width: 2rem; height: 2rem; background: rgba(255,255,255,0.1); border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; z-index: 100; }
+        .btn-close-detail svg { width: 1rem; height: 1rem; fill: #fff; transition: 0.3s; }
         .btn-close-detail:hover { background: var(--accent-color); }
-        
         .view-mode-detail .info-box { transform: translateX(0); }
-        .info-category { color: var(--accent-color); font-size: 0.85rem; font-weight: 700; margin-bottom: 12px; text-transform: uppercase;}
-        .info-title { font-size: 2rem; font-weight: 700; margin-bottom: 16px; line-height: 1.3; padding-right: 20px; }
-        .info-meta { display: flex; gap: 16px; align-items: center; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-        .meta-item { display: flex; gap: 8px; font-size: 0.9rem; align-items: center;}
-        .meta-label { color: #888; font-weight: 600; }
+        .info-category { color: var(--accent-color); font-size: 0.85rem; font-weight: 700; margin-bottom: 0.75rem; text-transform: uppercase;}
+        .info-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 1rem; line-height: 1.3; padding-right: 1.25rem; word-break: keep-all; }
+        .info-meta { display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .meta-item { display: flex; gap: 0.5rem; font-size: 0.9rem; align-items: center;}
+        .meta-label { color: #888; font-weight: 700; }
         .meta-value { color: #ddd; font-weight: 500; }
         .meta-divider { width: 1px; height: 12px; background: rgba(255,255,255,0.2); }
-        .info-desc { font-size: 1rem; color: #aaa; line-height: 1.6; white-space: pre-line; margin-bottom: 32px; }
+        .info-desc { font-size: 0.95rem; color: #aaa; font-weight: 500; line-height: 1.6; white-space: pre-line; margin-bottom: 2rem; }
         
-        .estimate-btn { margin-top: auto; width: 100%; background-color: var(--accent-color); color: #ffffff; border: none; border-radius: 12px; padding: 16px 0; font-size: 1.05rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(236, 99, 0, 0.3); }
+        .estimate-btn { margin-top: auto; width: 100%; background-color: var(--accent-color); color: #ffffff; border: none; border-radius: 0.5rem; padding: 1rem 0; font-size: 1.05rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(236, 99, 0, 0.3); }
         .estimate-btn:hover { transform: translateY(-2px); background-color: #d15600; box-shadow: 0 6px 20px rgba(236, 99, 0, 0.5); }
 
         .nav-arrow-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0; height: 100%; display: flex; justify-content: space-between; z-index: 20; pointer-events: none; }
@@ -216,22 +234,26 @@
         .nav-arrow.left { background: linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%); justify-content: flex-start; padding-left: 5%; }
         .nav-arrow.right { background: linear-gradient(to left, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%); justify-content: flex-end; padding-right: 5%; }
         .nav-arrow:hover { opacity: 1; }
-        .nav-arrow svg { position: relative; z-index: 20; width: 50px; height: 50px; fill: white; transition: transform 0.2s, fill 0.2s; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); pointer-events: none; }
+        .nav-arrow svg { position: relative; z-index: 20; width: 3.125rem; height: 3.125rem; fill: white; transition: transform 0.2s, fill 0.2s; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); pointer-events: none; }
         .nav-arrow:hover svg { transform: scale(1.2); fill: var(--accent-color); }
 
-        .thumbnail-strip-wrapper { position: relative; transition: opacity 0.3s, transform 0.3s; pointer-events: auto; width: 100%; margin-top: 20px; }
+        .thumbnail-strip-wrapper { position: relative; transition: opacity 0.3s, transform 0.3s; pointer-events: auto; width: 100%; margin-top: 1.25rem; }
+        .thumbnail-strip-wrapper::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 7.5rem; background: linear-gradient(to left, var(--bg-color), transparent); pointer-events: none; z-index: 10; opacity: 0.9; }
+        
         .view-mode-grid .thumbnail-strip-wrapper { opacity: 0; pointer-events: none; transform: translateY(20px); height: 0; overflow: hidden; margin-top: 0; }
         .view-mode-detail .thumbnail-strip-wrapper { opacity: 1; pointer-events: auto; transform: translateY(0); height: auto; }
-        .thumbnail-strip { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+        .thumbnail-strip { display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 0.625rem; scrollbar-width: none; }
         .thumbnail-strip::-webkit-scrollbar { display: none; }
-        .thumb-item-wrapper { flex: 0 0 200px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; scroll-snap-align: start; }
-        .thumb-item { width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; opacity: 0.5; transition: 0.2s; border: 2px solid transparent; background-color: #222; position: relative; }
-        .thumb-item-wrapper:hover .thumb-item { opacity: 0.8; transform: translateY(-2px); }
-        .thumb-item-wrapper.active .thumb-item { opacity: 1; border-color: var(--accent-color); box-shadow: 0 4px 15px rgba(236, 99, 0, 0.3); }
+        .thumb-item-wrapper { flex: 0 0 12.5rem; display: flex; flex-direction: column; gap: 0.5rem; cursor: pointer; scroll-snap-align: start; }
+        
+        .thumb-item { width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 0; overflow: hidden; transition: 0.2s; border: 2px solid transparent; background-color: #222; position: relative; }
         .thumb-item img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-        .thumb-title-text { font-size: 0.85rem; color: #999; font-weight: 600; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; transition: color 0.2s ease; }
-        .thumb-item-wrapper:hover .thumb-title-text { color: #fff; }
-        .thumb-item-wrapper.active .thumb-title-text { color: var(--accent-color); }
+        .thumb-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; padding: 0.625rem; text-align: center; }
+        .thumb-title-text { font-size: 0.9rem; color: #fff; font-weight: 700; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
+        
+        .thumb-item-wrapper:hover .thumb-overlay { opacity: 1; }
+        .thumb-item-wrapper.active .thumb-item { border-color: var(--accent-color); opacity: 1; }
+        .thumb-item-wrapper.active .thumb-overlay { opacity: 1; background: rgba(236, 99, 0, 0.4); }
 
         .slide-out-left { transform: translateX(-150%) scale(0.95); opacity: 0; }
         .slide-out-right { transform: translateX(150%) scale(0.95); opacity: 0; }
@@ -243,25 +265,24 @@
         /* =========================================
            [SECTION 3] Services 
         ========================================= */
-        .services-section { position: relative; display: flex; flex-direction: column; justify-content: flex-end; z-index: 30; overflow: hidden; }
+        .services-section { position: relative; z-index: 30; overflow: hidden; }
         .hero-bgs { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background-color: #0e0f0f; }
         .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.8s ease-in-out; filter: brightness(0.6) contrast(1.1); will-change: opacity; }
         .hero-bg.active { opacity: 1; }
-        .hero-gradient { position: absolute; bottom: 0; left: 0; width: 100%; height: 65vh; background: linear-gradient(to top, var(--bg-color) 10%, transparent 100%); z-index: 1; pointer-events: none; }
+        .hero-gradient { position: absolute; bottom: 0; left: 0; width: 100%; height: 80vh; background: linear-gradient(to top, var(--bg-color) 10%, transparent 100%); z-index: 1; pointer-events: none; }
         
-        .hero-content { position: relative; z-index: 10; max-width: 800px; padding-bottom: 40px; padding-right: 40px; }
-        .hero-title { font-size: clamp(3rem, 5vw, 5rem); font-weight: 700; color:var(--text-color); margin-bottom: 20px; letter-spacing: -2px; transition: opacity 0.4s ease, transform 0.4s ease; word-break: keep-all; }
-        /* 💡 픽스: 텍스트 내용 길이에 따라 높이가 달라져 아래쪽 레이아웃이 요동치는(덜컹거리는) 현상 방지 (min-height) */
-        .hero-desc { font-size: clamp(1rem, 1.5vw, 1.2rem); color: var(--text-color); opacity: 0.85; line-height: 1.6; word-break: keep-all; max-width: 650px; transition: opacity 0.4s ease, transform 0.4s ease; min-height: 5.5em; }
+        .hero-content { position: relative; z-index: 10; max-width: 50rem; padding-bottom: 1.25rem; text-align: center; }
+        .hero-title { font-size: 2.2rem; font-weight: 600; color:var(--text-color); margin-bottom: 0.9375rem; letter-spacing: -1px; transition: opacity 0.4s ease, transform 0.4s ease; word-break: keep-all; }
+        .hero-desc { font-size: 1.3rem; font-weight: 400; color: var(--text-color); opacity: 0.85; line-height: 1.6; word-break: keep-all; transition: opacity 0.4s ease, transform 0.4s ease; min-height: 4em; } 
         
-        .posters-section { position: relative; z-index: 20; width: 100%; padding-bottom: 60px; }
-        .posters-track { display: flex; gap: 26px; overflow-x: auto; padding: 40px 40px 60px 40px; margin-top: -20px; margin-left: -40px; scrollbar-width: none; }
+        .posters-section { position: relative; z-index: 20; width: 100%; max-width: 87.5rem; padding-bottom: 1.25rem; }
+        .posters-track { display: flex; justify-content: center; gap: 1.5rem; padding: 1.25rem 2.5rem 2.5rem 2.5rem; scrollbar-width: none; flex-wrap: wrap; }
         .posters-track::-webkit-scrollbar { display: none; }
-        .poster-item { flex: 0 0 clamp(160px, 15vw, 220px); aspect-ratio: 2 / 3; position: relative; border-radius: 12px; overflow: hidden; cursor: pointer; background: #1a1a1a; border: 2px solid transparent; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease, border-color 0.4s ease; }
+        .poster-item { flex: 0 0 clamp(10rem, 15vw, 13.75rem); aspect-ratio: 2 / 3; position: relative; border-radius: 0.75rem; overflow: hidden; cursor: pointer; background: #1a1a1a; border: 2px solid transparent; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease, border-color 0.4s ease; }
         .poster-item:hover { transform: scale(1.08) translateY(-10px); box-shadow: 0 15px 40px rgba(236, 99, 0, 0.6); border-color: rgba(236, 99, 0, 0.8); z-index: 30; }
         .poster-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: filter 0.5s ease, transform 0.5s ease; pointer-events: none; }
         .poster-item:hover .poster-img { filter: brightness(1.1); transform: scale(1.05); }
-        .poster-overlay { position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 50%, transparent 100%); display: flex; align-items: flex-end; padding: 20px; pointer-events: none; }
+        .poster-overlay { position: absolute; bottom: -2px; left: -2px; right: -2px; width: auto; height: calc(50% + 4px); background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 50%, transparent 100%); display: flex; align-items: flex-end; padding: 1.25rem; pointer-events: none; border-bottom-left-radius: 0.625rem; border-bottom-right-radius: 0.625rem; }
         .poster-title { font-size: clamp(1.2rem, 2vw, 1.96rem); font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: -0.5px; transition: color 0.3s ease; }
         .poster-item:hover .poster-title { color: var(--accent-color); }
 
@@ -269,38 +290,35 @@
            [SECTION 4] Contact Form & Footer
         ========================================= */
         .contact-section { 
-            position: relative;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            z-index: 40; padding: 80px 40px 100px 280px; transition: background-color 0.3s; overflow: hidden;
+            position: relative; z-index: 40; padding-bottom: 6.25rem; transition: background-color 0.3s; overflow: hidden; padding-top: 6.25rem;
         }
         .contact-wrapper {
-            width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 30px; margin: 0 auto;
+            width: 100%; max-width: 37.5rem; display: flex; flex-direction: column; align-items: center; margin: 0 auto;
         }
         .contact-container { 
-            width: 100%; background: var(--contact-bg); padding: 45px 50px; border-radius: 24px; 
-            border: 1px solid var(--contact-border); backdrop-filter: blur(20px); 
-            box-shadow: 0 30px 60px rgba(0,0,0,0.15); transition: background 0.3s, border-color 0.3s; 
+            width: 100%; background: transparent; padding: 0; border-radius: 0; 
+            border: none; box-shadow: none; transition: background 0.3s, border-color 0.3s; 
         }
-        .contact-title { font-size: clamp(2.2rem, 4vw, 3rem); font-weight: 700; color: var(--text-color); margin-bottom: 8px; transition: color 0.3s; }
-        .contact-desc { font-size: 1.05rem; color: var(--text-color); opacity: 0.7; margin-bottom: 30px; transition: color 0.3s; }
-        .contact-form { display: flex; flex-direction: column; gap: 18px; }
-        .form-group { display: flex; flex-direction: column; gap: 8px; }
-        .contact-form label { font-size: 0.9rem; font-weight: 600; color: var(--text-color); }
-        .contact-form input, .contact-form select, .contact-form textarea { width: 100%; padding: 14px 18px; font-size: 1rem; color: var(--text-color); background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 12px; outline: none; transition: border-color 0.3s, background 0.3s, color 0.3s; font-family: inherit; }
+        .contact-desc { font-size: 1.3rem; font-weight: 500; color: var(--text-color); margin-bottom: 3.125rem; transition: color 0.3s; text-align: center; }
+        
+        .contact-form { display: flex; flex-direction: column; gap: 3.125rem; width: 100%; }
+        .form-group { display: flex; flex-direction: column; gap: 0.625rem; }
+        .contact-form label { font-size: 1.3rem; font-weight: 700; color: #888; text-align: center; }
+        .contact-form input, .contact-form select, .contact-form textarea { width: 100%; padding: 0.875rem 1.125rem; font-size: 1.3rem; color: var(--text-color); font-weight: 500; background: transparent; border: 1px solid var(--input-border); border-radius: 0.5rem; outline: none; transition: border-color 0.3s, color 0.3s; font-family: inherit; }
         .contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { border-color: var(--accent-color); }
-        .contact-form textarea { resize: vertical; min-height: 100px; }
-        #referenceLink { color: var(--accent-color); font-weight: 600; }
-        .contact-submit { margin-top: 5px; background: var(--accent-color); color: #fff; border: none; padding: 16px; border-radius: 12px; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(236, 99, 0, 0.3); }
+        .contact-form textarea { resize: vertical; min-height: 7.5rem; }
+        
+        .contact-submit { margin-top: 0.625rem; background: var(--accent-color); color: #fff; border: none; padding: 1.125rem; border-radius: 0.5rem; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(236, 99, 0, 0.3); }
         .contact-submit:hover { transform: translateY(-3px); background: #d15600; box-shadow: 0 8px 25px rgba(236, 99, 0, 0.5); }
 
         .footer-info {
-            position: absolute; bottom: 20px; left: 280px; right: 0;
-            display: flex; justify-content: center; align-items: center; flex-wrap: nowrap; gap: 14px;
-            color: var(--text-color); opacity: 0.35; font-size: 0.75rem; letter-spacing: 0.3px;
-            transition: color 0.3s; pointer-events: none; white-space: nowrap;
+            position: absolute; bottom: 1.875rem; left: 0; right: 0;
+            display: flex; justify-content: center; align-items: center; flex-wrap: nowrap; gap: 0.875rem;
+            color: var(--text-color); opacity: 0.4; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.3px;
+            transition: color 0.3s; pointer-events: none; white-space: nowrap; text-align: center;
         }
         .footer-info span { display: inline-flex; align-items: center; }
-        .footer-info span:not(:last-child)::after { content: "|"; opacity: 0.4; margin-left: 14px; }
+        .footer-info span:not(:last-child)::after { content: "|"; opacity: 0.4; margin-left: 0.875rem; }
 
         /* =========================================
            [OVERLAY] 이스터에그 (단체사진)
@@ -312,10 +330,10 @@
         }
         .close-team {
             position: absolute; top: 40px; right: 40px; background: none; border: none;
-            color: #fff; font-size: 3rem; font-weight: 300; cursor: pointer; transition: color 0.3s ease;
+            color: #fff; font-size: 3rem; font-weight: 500; cursor: pointer; transition: color 0.3s ease;
         }
         .close-team:hover { color: var(--accent-color); }
-        .team-image { width: 80vw; max-width: 800px; aspect-ratio: 16/9; object-fit: cover; border-radius: 20px; box-shadow: 0 20px 50px rgba(236, 99, 0, 0.4); transform: scale(0.8); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .team-image { width: 80vw; max-width: 50rem; aspect-ratio: 16/9; object-fit: cover; border-radius: 1.25rem; box-shadow: 0 20px 50px rgba(236, 99, 0, 0.4); transform: scale(0.8); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
         /* =========================================
            📱 [모바일 대응 반응형 CSS] 
@@ -332,53 +350,136 @@
             .menu-wrapper { top: 80px; left: 50%; transform: translateX(-50%); width: 100%; padding: 0 20px; z-index: 150;}
             .menu-list { flex-direction: row; justify-content: center; gap: 30px; flex-wrap: wrap; }
             .nav-item { width: auto; }
-            .nav-link { font-size: 0.95rem; padding-left: 16px; padding-bottom: 0; }
+            .nav-link { font-size: 15px; padding-left: 16px; padding-bottom: 0; }
             .nav-link .active-dot { top: auto; bottom: auto; left: 0; transform: scale(0); }
             .nav-link.active .active-dot { transform: scale(1); }
             .sub-menu { display: none !important; }
 
-            .spotlight-container {
-                align-items: flex-start;
-                padding-top: 105px; 
-            }
-            .svg-wrapper { width: max(250vw, 1000px); }
-            
-            .main-title { top: 35%; }
+            .spotlight-container { align-items: flex-start; padding-top: 0 !important; }
+            .svg-wrapper { margin-top: 115px !important; width: max(200vw, 800px); }
+            .main-title { top: 50% !important; transform: translate(-50%, -50%) !important; }
 
-            .section-padding { padding: 140px 20px 20px 20px; }
-            .grid-view { grid-template-columns: repeat(2, 1fr); } 
+            /* 💡 공통: 모바일에서 앱솔루트로 겹치지 않게 자연스러운 배치로 복구 */
+            .section-padding { padding: 115px 20px 40px 20px !important; justify-content: flex-start !important; }
             
-            .detail-view { flex-direction: column; overflow-y: auto; justify-content: flex-start; align-items: center; padding-bottom: 20px; }
+            .section-header { 
+                position: relative !important; top: 0 !important; left: 0 !important; 
+                transform: none !important; width: 100%; 
+            }
+            .section-title, .contact-title { font-size: 2rem !important; }
+            
+            /* [간격 조절] 포트폴리오 타이틀 <-> 카테고리 탭 */
+            #portfolio .section-header { margin-bottom: 20px !important; }
+
+            /* 💡 포트폴리오 카테고리 (중앙 정렬, 줄바꿈, 폰트 축소, 안전여백 추가) */
+            .category-tabs { 
+                justify-content: center !important; 
+                flex-wrap: wrap !important; 
+                padding: 0 20px !important; 
+                gap: 15px !important; 
+                width: 100%;
+            }
+            .category-tab { font-size: 0.9rem !important; }
+
+            .portfolio-section { justify-content: flex-start; }
+            
+            /* 💡 포트폴리오 그리드 뷰 (페이지 넘버 딸림 방지를 위해 최소 높이 설정) */
+            .view-container { flex: 1; display: flex; flex-direction: column; width: 100%; align-items: center; }
+            
+            /* [간격 조절] 카테고리 탭 <-> 그리드 뷰(썸네일 영역) */
+            .view-mode-grid .grid-view-wrapper { margin-top: 10px; position: relative; opacity: 1; transform: none; display: flex !important; flex-direction: column; width: 100%; align-items: center; }
+            .view-mode-grid .detail-view { display: none !important; }
+            
+            .view-mode-detail .grid-view-wrapper { display: none !important; }
+            .view-mode-detail .detail-view { position: relative; opacity: 1; transform: none; display: flex !important; flex-direction: column; width: 100%; align-items: center; padding-bottom: 20px; }
+            
+            .grid-view { 
+                display: grid; 
+                grid-template-columns: repeat(2, 1fr); 
+                gap: 10px; 
+                width: 100%; 
+                padding: 0 10px; 
+                align-content: flex-start; /* 썸네일 위쪽으로 차곡차곡 쌓임 */
+                min-height: 380px; /* 💡 최소 3줄(6개) 들어갈 공간 강제 확보 (페이지네이션 고정 효과) */
+            } 
+            
+            /* [간격 조절] 그리드 뷰 <-> 하단 페이지 넘버 */
+            .pagination { 
+                position: relative !important; bottom: auto !important; left: 0 !important; 
+                transform: none !important; margin-top: 30px !important; padding-bottom: 20px !important; 
+                width: 100% !important; display: flex; justify-content: center; 
+            }
+
             .detail-view-left { width: 100%; height: auto; flex: none; flex-shrink: 0; margin-bottom: 15px; }
             .video-player-wrapper { aspect-ratio: 16/9; max-height: none; }
             
             .thumbnail-strip-wrapper { display: block !important; margin-top: 10px; width: 100%; }
+            .thumbnail-strip-wrapper::after { width: 60px; }
             .thumbnail-strip { gap: 10px; padding-bottom: 5px; }
             .thumb-item-wrapper { flex: 0 0 120px; }
+            .thumb-overlay { display: none; }
 
-            .info-box { width: 100%; padding: 16px; transform: translateY(0); max-height: none; margin-top: 0; border-radius: 12px; flex-shrink: 0; }
+            .info-box { width: 100%; padding: 16px; transform: translateY(0); max-height: none; margin-top: 0; flex-shrink: 0; }
             .info-title { font-size: 1.25rem; margin-bottom: 6px; }
             .info-category { font-size: 0.8rem; margin-bottom: 6px; }
             .info-meta { margin-bottom: 10px; padding-bottom: 10px; font-size: 0.85rem; }
             .info-desc { font-size: 0.9rem; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
             .estimate-btn { padding: 12px 0; font-size: 1rem; }
-            .view-mode-detail .thumbnail-strip-wrapper { display: block; }
             
-            .services-section { justify-content: center; padding-top: 130px; }
-            .hero-content { padding-bottom: 15px; }
-            .posters-section { padding-bottom: 10px; }
-            /* 💡 픽스: 모바일 포스터 영역 확대 시 위쪽 클리핑 방지 여백 (margin & padding 조정) */
-            .posters-track { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: -20px 0 0 0; padding: 20px 0 10px 0; }
-            .poster-item { flex: 0 0 calc(33.333% - 12px); max-width: calc(33.333% - 12px); aspect-ratio: 2/3; }
-            .poster-title { font-size: 0.85rem; padding: 10px; width: 100%; text-align: center; word-break: keep-all; font-weight: 700; }
+            .services-section { justify-content: flex-start !important; padding-top: 115px !important; padding-bottom: 40px !important; }
+            
+            /* [간격 조절] 서비스 메인 타이틀(Services) <-> 전문 촬영 타이틀 */
+            #services .section-header { margin-bottom: 120px !important; }
+            
+            /* 💡 서비스 타이틀, 썸네일 중앙 배치 및 썸네일 끌어올리기 */
+            .hero-content { display: flex; flex-direction: column; align-items: center; width: 100%; text-align: center; }
+            
+            /* [간격 조절] 서비스 항목 타이틀(전문 촬영) <-> 설명 문구 */
+            .hero-title { font-size: 1.5rem !important; margin-bottom: 8px !important; text-align: center; }
+            
+            /* [간격 조절] 서비스 설명 문구 <-> 썸네일 그룹 */
+            .hero-desc { font-size: 0.9rem !important; line-height: 1.5; min-height: 3em; max-width: 100%; text-align: center; }
+            .hero-content { margin-bottom: 20px !important; padding-bottom: 0 !important; }
+            
+            .posters-section { padding-bottom: 0; overflow: visible !important; }
+            
+            /* 💡 서비스 썸네일 좌우 잘림 해결 (음수 마진 사용) */
+            .posters-track { 
+                display: flex !important; flex-wrap: nowrap !important; justify-content: flex-start !important; 
+                gap: 13px !important; 
+                margin: 0 -20px !important; /* 부모의 20px 패딩을 무시하고 화면 끝까지 확장 */
+                padding: 10px 20px 20px 20px !important; /* 다시 안쪽으로 여백을 주어 스크롤 바운드 형성 */
+                overflow-x: auto !important; scrollbar-width: none; -ms-overflow-style: none;
+            }
+            .posters-track::after { content: ''; flex: 0 0 20px; display: block; }
+            .poster-item { flex: 0 0 160px !important; max-width: none !important; aspect-ratio: 2/3; }
+            
+            .poster-item:hover, .poster-item:active, .poster-item:focus { transform: none !important; box-shadow: none !important; border-color: rgba(236, 99, 0, 0.8) !important; }
+            .poster-title { font-size: 1.3rem !important; padding: 10px; width: 100%; text-align: center; word-break: keep-all; font-weight: 700; }
             .poster-overlay { padding: 8px; }
 
+            /* 💡 컨택트 페이지 겹침 버그 픽스 및 간격 조절 */
             .contact-section { 
                 height: auto !important; min-height: 100dvh; scroll-snap-align: start; 
-                padding: 130px 20px 60px 20px; justify-content: flex-start;
+                justify-content: flex-start !important; padding-top: 115px !important;
             }
+            
+            /* [간격 조절] 컨택트 메인 타이틀(Contact Us) <-> 설명 문구 */
+            .contact-title { margin-bottom: 0px !important; }
+            
+            /* [간격 조절] 컨택트 설명 문구 <-> 아래 폼 영역 */
+            .contact-desc { font-size: 0.9rem !important; margin-bottom: 30px !important; line-height: 1.5; }
+            
             .contact-wrapper { margin: 0; gap: 20px; }
-            .contact-container { padding: 30px 20px; }
+            .contact-container { padding: 0 20px; }
+            
+            /* 폼 내부 요소 간격 축소 */
+            .contact-form { gap: 20px !important; }
+            .form-group { gap: 6px !important; }
+            .contact-form label { font-size: 0.9rem !important; }
+            .contact-form input, .contact-form select, .contact-form textarea { font-size: 0.9rem !important; padding: 10px 12px !important; }
+            .contact-submit { font-size: 1rem !important; padding: 14px !important; }
+            
             .footer-info { 
                 position: relative; bottom: auto; left: auto; margin-top: 40px; 
                 width: 100%; text-align: center; white-space: normal; padding: 0 10px;
@@ -390,18 +491,18 @@
         @media (max-width: 480px) {
             .logo-wrapper { transform: translateX(-50%) scale(0.44); }
             .menu-list { gap: 24px; }
-            .nav-link { font-size: 0.85rem; padding-left: 12px; }
-            .section-padding { padding-top: 110px; }
+            .nav-link { font-size: 14px; padding-left: 12px; }
             .close-team { top: 20px; right: 20px; font-size: 2.5rem; }
             
-            .spotlight-container { padding-top: 95px; }
-            .main-title { top: 32% !important; }
+            .svg-wrapper { margin-top: 5px !important; }
+            .main-title { top: 50% !important; }
+            .poster-item { flex: 0 0 145px !important; }
+            .section-title, .contact-title { font-size: 2.2rem; }
         }
     </style>
 </head>
 <body class="no-scroll">
 
-    <!-- 💡 모바일 헤더용 배경 요소 -->
     <div class="mobile-header-bg" id="mobileHeaderBg"></div>
 
     <!-- [PAGE 1] 메가 로고 오프닝 커버 -->
@@ -438,9 +539,7 @@
     <!-- 이스터에그 단체사진 오버레이 -->
     <div id="teamOverlay">
         <button class="close-team" id="closeTeamBtn">&times;</button>
-        <!-- 💡 이스터에그 이미지 교체 부분 💡 -->
-        <!-- 아래의 src="https://..." 부분을 원하시는 파일명(예: team.jpg)으로 바꾸시면 됩니다. -->
-        <img src="https://moldoo.info/assets/J4_07449_3.jpg" alt="Team Photo" class="team-image" id="teamImg">
+        <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800" alt="Team Photo" class="team-image" id="teamImg">
     </div>
 
     <div class="menu-wrapper" id="menuWrapper">
@@ -464,7 +563,6 @@
     <main>
         <!-- 1. About Us -->
         <section id="about" class="about-section scroll-section">
-            
             <div class="spotlight-container" id="spotlightContainer">
                 <div class="svg-wrapper" id="svgWrapper">
                     <svg id="_레이어_2" data-name="레이어 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2059.02 2342.91"> 
@@ -538,9 +636,13 @@
             </div>
             <div class="hero-gradient"></div>
             
+            <div class="section-header">
+                <h2 class="section-title">Services</h2>
+            </div>
+            
             <div class="hero-content">
-                <h1 class="hero-title" id="hero-title">Our Services</h1>
-                <p class="hero-desc" id="hero-desc">클라이언트의 목적에 부합하는 솔루션을 선택하세요.<br>기획, 촬영, 후반 작업 그리고 디자인까지 몰두 스튜디오가 가장 확실한 답을 제시합니다.</p>
+                <h2 class="hero-title" id="hero-title">전문 촬영</h2>
+                <p class="hero-desc" id="hero-desc">다양한 환경에 대응 가능한 최적의 장비 셋팅으로 전문가가 투입되어 촬영을 진행합니다.</p>
             </div>
 
             <div class="posters-section" id="posters-section">
@@ -551,19 +653,23 @@
         </section>
 
         <!-- 4. Contact & Footer -->
-        <section id="contact" class="contact-section scroll-section">
+        <!-- 💡 HTML: 모바일에서 줄바꿈이 자연스럽게 들어가도록 <br> 태그 추가됨 -->
+        <section id="contact" class="contact-section section-padding scroll-section">
+            <div class="section-header">
+                <h2 class="contact-title">Contact Us</h2>
+                <p class="contact-desc">당신의 프로젝트를 기다립니다.<br>아래 폼을 통해 편하게 문의해 주세요.</p>
+            </div>
+
             <div class="contact-wrapper">
                 <div class="contact-container">
-                    <h2 class="contact-title">Contact Us</h2>
-                    <p class="contact-desc">당신의 프로젝트를 기다립니다. 아래 폼을 통해 편하게 문의해 주세요.</p>
                     <form action="mailto:contact@moldoo.com" method="POST" enctype="text/plain" class="contact-form" id="contactForm">
                         <div class="form-group">
                             <label for="name">이름 / 회사명</label>
-                            <input type="text" id="name" name="Name" placeholder="홍길동 / (주)몰두" required>
+                            <input type="text" id="name" name="Name" required>
                         </div>
                         <div class="form-group">
                             <label for="email">답변 받을 이메일</label>
-                            <input type="email" id="email" name="Email" placeholder="example@moldoo.com" required>
+                            <input type="email" id="email" name="Email" required>
                         </div>
                         <div class="form-group">
                             <label for="serviceType">필요한 서비스</label>
@@ -578,11 +684,11 @@
                         </div>
                         <div class="form-group">
                             <label for="referenceLink">레퍼런스 링크 첨부</label>
-                            <input type="url" id="referenceLink" name="ReferenceLink" placeholder="유튜브 등 참고할 만한 영상 링크 (선택 사항)">
+                            <input type="url" id="referenceLink" name="ReferenceLink">
                         </div>
                         <div class="form-group">
                             <label for="message">프로젝트 내용</label>
-                            <textarea id="message" name="Message" placeholder="예산, 일정, 기타 사항 등 프로젝트에 대한 간단한 설명을 남겨주세요." required></textarea>
+                            <textarea id="message" name="Message" required></textarea>
                         </div>
                         <button type="submit" class="contact-submit">의뢰 접수하기</button>
                     </form>
@@ -777,27 +883,21 @@
 
             let finalBgR, finalBgG, finalBgB, finalTxt;
             if (contactProg > 0) {
-                finalBgR = Math.round(14 + (255 - 14) * contactProg);
-                finalBgG = Math.round(15 + (255 - 15) * contactProg);
-                finalBgB = Math.round(15 + (255 - 15) * contactProg);
+                finalBgR = Math.round(14 + (255 - 0) * contactProg);
+                finalBgG = Math.round(15 + (255 - 0) * contactProg);
+                finalBgB = Math.round(15 + (255 - 0) * contactProg);
                 finalTxt = Math.round(255 + (17 - 255) * contactProg);
                 
-                root.style.setProperty('--contact-bg', `rgba(240, 240, 240, ${0.1 + (0.8 - 0.1) * contactProg})`);
-                root.style.setProperty('--contact-border', `rgba(0,0,0,0.1)`);
-                root.style.setProperty('--input-bg', `rgba(255, 255, 255, ${contactProg})`);
-                root.style.setProperty('--input-border', `rgba(0,0,0,0.2)`);
+                root.style.setProperty('--input-border', `rgba(0,0,0,0.3)`);
                 
                 if(mobileHeaderBg) mobileHeaderBg.classList.add('active');
             } else {
-                finalBgR = Math.round(255 + (14 - 255) * aboutProg);
-                finalBgG = Math.round(255 + (15 - 255) * aboutProg);
-                finalBgB = Math.round(255 + (15 - 255) * aboutProg);
+                finalBgR = Math.round(255 + (0 - 255) * aboutProg);
+                finalBgG = Math.round(255 + (0 - 255) * aboutProg);
+                finalBgB = Math.round(255 + (0 - 255) * aboutProg);
                 finalTxt = Math.round(17 + (255 - 17) * aboutProg);
 
-                root.style.setProperty('--contact-bg', `rgba(25, 25, 25, 0.6)`);
-                root.style.setProperty('--contact-border', `rgba(255,255,255,0.05)`);
-                root.style.setProperty('--input-bg', `#1a1a1a`);
-                root.style.setProperty('--input-border', `#333`);
+                root.style.setProperty('--input-border', `rgba(255,255,255,0.2)`);
                 
                 if(mobileHeaderBg) mobileHeaderBg.classList.remove('active');
             }
@@ -813,6 +913,15 @@
             svgWrapper.style.transform = `translate(0px, ${blurTranslateY}px) rotate(0deg) scale(1, 1)`;
 
             spotlight.style.opacity = Math.max(0, 1 - aboutProg * 1.5);
+
+            const servicesRect = document.getElementById('services').getBoundingClientRect();
+            let servicesProg = 0;
+            if (servicesRect.top < windowHeight * 0.8) {
+                servicesProg = (windowHeight * 0.8 - servicesRect.top) / (windowHeight * 0.5);
+            }
+            servicesProg = Math.max(0, Math.min(1, servicesProg));
+            const bgsContainer = document.getElementById('hero-bgs-container');
+            if(bgsContainer) bgsContainer.style.opacity = servicesProg;
 
             requestAnimationFrame(renderGlobalScroll);
         }
@@ -929,16 +1038,8 @@
             };
 
             let curData = portData, curIdx = 0, isAnim = false;
-            let itemsPerPage = window.innerWidth <= 1024 ? 4 : 6;
+            let itemsPerPage = 6; 
             let curPage = 1;
-
-            window.addEventListener('resize', () => {
-                let newItemsPerPage = window.innerWidth <= 1024 ? 4 : 6;
-                if (newItemsPerPage !== itemsPerPage) {
-                    itemsPerPage = newItemsPerPage;
-                    curPage = 1; renderGrid();
-                }
-            });
 
             function syncFilters(val) {
                 PortDOM.filterWrap.querySelectorAll('.category-tab').forEach(b => {
@@ -996,8 +1097,12 @@
                 
                 PortDOM.grid.innerHTML = pageData.map((item, i) => `
                     <div class="grid-item-wrapper" data-index="${start + i}">
-                        <div class="grid-item"><img loading="lazy" src="https://img.youtube.com/vi/${item.id}/mqdefault.jpg"></div>
-                        <div class="grid-item-title">${item.title}</div>
+                        <div class="grid-item">
+                            <img loading="lazy" src="https://img.youtube.com/vi/${item.id}/mqdefault.jpg">
+                            <div class="grid-item-overlay">
+                                <div class="overlay-title">${item.title}</div>
+                            </div>
+                        </div>
                     </div>`).join('');
                     
                 renderPagination();
@@ -1021,8 +1126,10 @@
                 if(!PortDOM.thumbStrip) return;
                 PortDOM.thumbStrip.innerHTML = curData.map((item, i) => `
                     <div class="thumb-item-wrapper ${i === curIdx ? 'active' : ''}" data-index="${i}">
-                        <div class="thumb-item"><img loading="lazy" src="https://img.youtube.com/vi/${item.id}/mqdefault.jpg"></div>
-                        <div class="thumb-title-text">${item.title}</div>
+                        <div class="thumb-item">
+                            <img loading="lazy" src="https://img.youtube.com/vi/${item.id}/mqdefault.jpg">
+                            <div class="thumb-overlay"><span class="thumb-title-text">${item.title}</span></div>
+                        </div>
                     </div>`).join('');
 
                 PortDOM.thumbStrip.querySelectorAll('.thumb-item-wrapper').forEach(btn => {
@@ -1050,7 +1157,8 @@
             function loadVideo(item) {
                 PortDOM.player.src = `https://www.youtube.com/embed/${item.id}?rel=0&autoplay=1&mute=0&controls=1&showinfo=0`;
                 PortDOM.iCat.textContent = item.category; PortDOM.iTitle.textContent = item.title; 
-                PortDOM.iDesc.textContent = item.desc; PortDOM.iClient.textContent = item.client; PortDOM.iDate.textContent = item.date;
+                PortDOM.iClient.textContent = item.client; PortDOM.iDate.textContent = item.date;
+                PortDOM.iDesc.innerHTML = item.desc; 
                 updateThumbnailActive();
             }
 
@@ -1074,11 +1182,33 @@
                 }, 600);
             }
 
+            let activeTouchIdx = -1;
+            
             PortDOM.grid.addEventListener('click', e => {
                 const t = e.target.closest('.grid-item-wrapper'); if(!t || isAnim) return;
-                curIdx = parseInt(t.dataset.index); 
-                PortDOM.container.classList.remove('view-mode-grid'); PortDOM.container.classList.add('view-mode-detail');
+                const idx = parseInt(t.dataset.index); 
+                
+                if (window.innerWidth <= 1024) {
+                    if (activeTouchIdx !== idx) {
+                        document.querySelectorAll('.grid-item').forEach(el => el.classList.remove('touch-active'));
+                        t.querySelector('.grid-item').classList.add('touch-active');
+                        activeTouchIdx = idx;
+                        return;
+                    }
+                }
+                
+                activeTouchIdx = -1;
+                curIdx = idx; 
+                PortDOM.container.classList.remove('view-mode-grid'); 
+                PortDOM.container.classList.add('view-mode-detail');
                 loadVideo(curData[curIdx]);
+            });
+
+            document.addEventListener('click', e => {
+                if (window.innerWidth <= 1024 && !e.target.closest('.grid-item-wrapper')) {
+                    document.querySelectorAll('.grid-item').forEach(el => el.classList.remove('touch-active'));
+                    activeTouchIdx = -1;
+                }
             });
 
             PortDOM.prev.addEventListener('click', () => { if(curData.length<=1 || isAnim) return; curIdx = (curIdx - 1 + curData.length) % curData.length; slideVid(curData[curIdx], 'prev'); });
@@ -1101,7 +1231,7 @@
         })();
 
         // ==========================================
-        // 4. Services (데이터 연동)
+        // 4. Services (데이터 연동 및 자동 전환)
         // ==========================================
         let resetServices;
         (() => {
@@ -1114,21 +1244,28 @@
                 bgsContainer: document.getElementById('hero-bgs-container')
             };
             
+            const serviceKeys = Object.keys(ServData).filter(k => k !== 'default');
+            if(serviceKeys.length === 0) return;
+
             let bgsHTML = ''; let postersHTML = '';
             Object.keys(ServData).forEach(key => {
                 const d = ServData[key];
-                bgsHTML += `<img id="bg-${key}" src="${d.bgImg}" class="hero-bg ${key==='default'?'active':''}" loading="lazy">`;
+                bgsHTML += `<img id="bg-${key}" src="${d.bgImg}" class="hero-bg ${key===serviceKeys[0]?'active':''}" loading="lazy">`;
                 if (key !== 'default') {
                     postersHTML += `<div class="poster-item" data-id="${key}"><img loading="lazy" src="${d.posterImg}" class="poster-img"><div class="poster-overlay"><div class="poster-title">${d.title.replace('<br>', ' ')}</div></div></div>`;
                 }
             });
             ServDOM.bgsContainer.innerHTML = bgsHTML; ServDOM.track.innerHTML = postersHTML;
 
-            let curState = 'default';
+            let currentServiceIdx = 0;
+            let curState = serviceKeys[currentServiceIdx];
+            let autoSlideTimer = null;
             
             function changeState(id) {
-                if (curState === id) return; curState = id;
+                if (curState === id && ServDOM.title.style.opacity === '1') return; 
+                curState = id;
                 const d = ServData[id];
+                
                 document.querySelectorAll('.hero-bg').forEach(bg => bg.classList.remove('active'));
                 const activeBg = document.getElementById(`bg-${id}`); if (activeBg) activeBg.classList.add('active');
 
@@ -1136,7 +1273,9 @@
                     if(b.dataset.targetId === id) b.classList.add('active'); else b.classList.remove('active');
                 });
 
-                ServDOM.title.style.opacity = '0'; ServDOM.title.style.transform = 'translateY(10px)'; ServDOM.desc.style.opacity = '0'; ServDOM.desc.style.transform = 'translateY(10px)';
+                ServDOM.title.style.opacity = '0'; ServDOM.title.style.transform = 'translateY(10px)'; 
+                ServDOM.desc.style.opacity = '0'; ServDOM.desc.style.transform = 'translateY(10px)';
+                
                 setTimeout(() => {
                     ServDOM.title.innerHTML = d.title; ServDOM.desc.innerHTML = d.desc;
                     ServDOM.title.style.opacity = '1'; ServDOM.title.style.transform = 'translateY(0)';
@@ -1144,18 +1283,50 @@
                 }, 300); 
             }
 
-            ServDOM.track.addEventListener('mouseover', e => { const t = e.target.closest('.poster-item'); if (t) changeState(t.dataset.id); });
-            ServDOM.area.addEventListener('mouseleave', () => changeState('default'));
+            function startAutoSlide() {
+                if(autoSlideTimer) clearInterval(autoSlideTimer);
+                autoSlideTimer = setInterval(() => {
+                    currentServiceIdx = (currentServiceIdx + 1) % serviceKeys.length;
+                    changeState(serviceKeys[currentServiceIdx]);
+                }, 4000);
+            }
+
+            function stopAutoSlide() {
+                if(autoSlideTimer) clearInterval(autoSlideTimer);
+            }
+
+            ServDOM.track.addEventListener('mouseover', e => { 
+                stopAutoSlide();
+                const t = e.target.closest('.poster-item'); 
+                if (t) {
+                    currentServiceIdx = serviceKeys.indexOf(t.dataset.id);
+                    changeState(t.dataset.id); 
+                }
+            });
+            
+            ServDOM.track.addEventListener('mouseleave', () => {
+                startAutoSlide();
+            });
 
             document.querySelectorAll('#submenu-services .sub-link').forEach(btn => {
                 btn.addEventListener('click', e => {
                     e.preventDefault(); 
+                    stopAutoSlide();
+                    currentServiceIdx = serviceKeys.indexOf(e.target.dataset.targetId);
                     changeState(e.target.dataset.targetId);
                     document.getElementById('services').scrollIntoView({ behavior: 'smooth' });
+                    startAutoSlide();
                 });
             });
 
-            resetServices = () => { changeState('default'); };
+            changeState(serviceKeys[0]);
+            startAutoSlide();
+
+            resetServices = () => { 
+                currentServiceIdx = 0;
+                changeState(serviceKeys[0]); 
+                startAutoSlide(); 
+            };
         })();
     </script>
 </body>
