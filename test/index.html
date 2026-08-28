@@ -201,7 +201,6 @@
         .grid-item.touch-active .grid-item-overlay { opacity: 1; }
         .overlay-title { color: #fff; font-size: clamp(0.9rem, 1.5vw, 1.2rem); font-weight: 700; text-align: center; line-height: 1.4; word-break: keep-all; }
 
-        /* 디테일 뷰(영상+설명+썸네일) 화면 전체 너비 활용 레이아웃 */
         .detail-view { 
             position: absolute; top: 0; left: calc(50% - 50vw); width: 100vw; height: 100%;
             display: flex; flex-direction: column; gap: 2.5rem; justify-content: center; align-items: center;
@@ -213,7 +212,6 @@
         .view-mode-detail .grid-view-wrapper { opacity: 0; pointer-events: none; transform: scale(1.05); z-index: 1; }
         .view-mode-detail .detail-view { opacity: 1; pointer-events: auto; transform: scale(1); z-index: 5; }
 
-        /* 💡 영상과 설명 박스 높이 일치 */
         .detail-view-top { 
             display: flex; gap: 1.5rem; width: 100%; max-width: 87.5rem; margin: 0 auto; 
             align-items: stretch; 
@@ -231,9 +229,14 @@
             border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(24px); overflow-y: auto; color: #fff; 
             transform: translateX(1.25rem); transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.6s cubic-bezier(0.77, 0, 0.175, 1); position: relative; 
         }
+        
         .btn-close-detail { position: absolute; top: 1.25rem; right: 1.25rem; width: 2rem; height: 2rem; background: rgba(255,255,255,0.1); border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; z-index: 100; }
         .btn-close-detail svg { width: 1rem; height: 1rem; fill: #fff; transition: 0.3s; }
         .btn-close-detail:hover { background: var(--accent-color); }
+        
+        /* 모바일 전용 펼치기 버튼 (PC에서는 숨김) */
+        .btn-expand-detail { display: none; }
+
         .view-mode-detail .info-box { transform: translateX(0); }
         .info-category { color: var(--accent-color); font-size: 0.85rem; font-weight: 700; margin-bottom: 0.75rem; text-transform: uppercase;}
         .info-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 1rem; line-height: 1.3; padding-right: 1.25rem; word-break: keep-all; }
@@ -247,7 +250,6 @@
         .estimate-btn { margin-top: auto; width: 100%; background-color: var(--accent-color); color: #ffffff; border: none; border-radius: 0.5rem; padding: 1rem 0; font-size: 1.05rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(236, 99, 0, 0.3); }
         .estimate-btn:hover { transform: translateY(-2px); background-color: #d15600; box-shadow: 0 6px 20px rgba(236, 99, 0, 0.5); }
 
-        /* Hover Navigation arrows - 영상 상/하단 인터페이스 보호 */
         .nav-arrow-container { 
             position: absolute; top: 15%; bottom: 20%; left: 0; right: 0; height: auto; 
             display: flex; justify-content: space-between; z-index: 20; pointer-events: none; 
@@ -262,20 +264,15 @@
         .nav-arrow svg { position: relative; z-index: 20; width: 3.125rem; height: 3.125rem; fill: white; transition: transform 0.2s, fill 0.2s; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); pointer-events: none; }
         .nav-arrow:hover svg { transform: scale(1.2); fill: var(--accent-color); }
 
-        /* 💡 하단 썸네일 스트립 - 설명박스 우측 끝 정렬 및 50px 양방향 그라데이션 추가 */
         .thumbnail-strip-wrapper { 
             position: relative; transition: opacity 0.3s, transform 0.3s; pointer-events: auto; 
-            width: 100%; max-width: 87.5rem; margin: 0 auto; /* 상단 뷰와 정확히 너비 일치 */
+            width: 100%; max-width: 87.5rem; margin: 0 auto; 
         }
-        
-        /* 왼쪽 -25px ~ +25px 그라데이션 */
         .thumbnail-strip-wrapper::before { 
             content: ''; position: absolute; top: 0; left: -25px; bottom: 0; width: 50px; 
             background: linear-gradient(to right, var(--bg-color) 20%, transparent); 
             pointer-events: none; z-index: 10; 
         }
-        
-        /* 오른쪽 -25px ~ +25px 그라데이션 */
         .thumbnail-strip-wrapper::after { 
             content: ''; position: absolute; top: 0; right: -25px; bottom: 0; width: 50px; 
             background: linear-gradient(to left, var(--bg-color) 20%, transparent); 
@@ -285,7 +282,6 @@
         .view-mode-grid .thumbnail-strip-wrapper { opacity: 0; pointer-events: none; transform: translateY(20px); height: 0; overflow: hidden; margin-top: 0; }
         .view-mode-detail .thumbnail-strip-wrapper { opacity: 1; pointer-events: auto; transform: translateY(0); height: auto; }
         
-        /* 좌우 25px 추가 확장하여 그라데이션 영역 밑으로 스크롤이 흘러가게 구현 */
         .thumbnail-strip { 
             display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 0.625rem; scrollbar-width: none; 
             margin-left: -25px; padding-left: 25px;
@@ -409,10 +405,10 @@
 
             .section-padding { padding: 115px 20px 40px 20px !important; justify-content: flex-start !important; }
             
-            .section-header { 
-                position: relative !important; top: 0 !important; left: 0 !important; 
-                transform: none !important; width: 100%; 
-            }
+            /* 💡 포트폴리오 타이틀 클릭 시 그리드로 나가기 유도용 스타일 */
+            .section-header { position: relative !important; top: 0 !important; left: 0 !important; transform: none !important; width: 100%; }
+            #portfolio .section-title { cursor: pointer; } 
+            
             .section-title, .contact-title { font-size: 2rem !important; }
             
             /* [간격 조절] 포트폴리오 타이틀 <-> 카테고리 탭 */
@@ -438,7 +434,8 @@
             .view-mode-detail .grid-view-wrapper { display: none !important; }
             .view-mode-detail .detail-view { position: relative !important; left: 0 !important; width: 100% !important; opacity: 1; transform: none; display: flex !important; flex-direction: column; align-items: center; padding-bottom: 20px; }
             
-            .detail-view-top { flex-direction: column; gap: 15px; width: 100%; max-width: none; align-items: center; }
+            /* 💡 모바일 디테일 뷰 오버랩 해결 (position: relative) */
+            .detail-view-top { position: relative; flex-direction: column; gap: 15px; width: 100%; max-width: none; align-items: center; margin-top: 20px; }
             
             .grid-view { 
                 display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; padding: 0 10px; 
@@ -454,6 +451,36 @@
 
             .video-player-wrapper { width: 100%; aspect-ratio: 16/9; max-height: none; flex: none; flex-shrink: 0; margin-bottom: 0; }
             
+            /* 💡 모바일 전용 설명 펼쳐보기 UI 적용 */
+            .btn-close-detail { display: none !important; } /* 기존 닫기 버튼 숨김 */
+            
+            .btn-expand-detail { 
+                display: flex !important; position: absolute; top: 16px; right: 16px; 
+                width: 32px; height: 32px; background: rgba(255,255,255,0.1); 
+                border: none; border-radius: 50%; align-items: center; justify-content: center; cursor: pointer; z-index: 100;
+            }
+            .btn-expand-detail svg { width: 16px; height: 16px; fill: #fff; }
+            .btn-expand-detail:active { background: var(--accent-color); }
+            
+            .info-box { width: 100%; padding: 16px; transform: translateY(0); max-height: none; margin-top: 0; flex-shrink: 0; transition: all 0.4s ease; }
+            
+            /* 접혀있을 땐 긴 설명과 버튼을 가림 */
+            .info-box .info-desc, .info-box .estimate-btn { display: none; }
+            
+            /* 펼쳐진 상태: 화면을 덮음 */
+            .info-box.is-expanded {
+                position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50;
+                background: rgba(25, 25, 25, 0.95); backdrop-filter: blur(20px);
+                display: flex; flex-direction: column; justify-content: flex-start; padding-bottom: 30px;
+            }
+            .info-box.is-expanded .info-desc { display: block; margin-top: 15px; flex: 1; overflow-y: auto; }
+            .info-box.is-expanded .estimate-btn { display: block; margin-top: 20px; flex-shrink: 0; }
+            /* --------------------------------- */
+
+            .info-title { font-size: 1.25rem; margin-bottom: 6px; padding-right: 40px; }
+            .info-category { font-size: 0.8rem; margin-bottom: 6px; }
+            .info-meta { margin-bottom: 10px; padding-bottom: 10px; font-size: 0.85rem; border-bottom: none; }
+            
             .thumbnail-strip-wrapper { 
                 display: block !important; margin-top: 10px; width: 100vw !important; max-width: none;
                 padding-left: 0 !important; margin-left: -20px !important; margin-right: -20px !important;
@@ -465,13 +492,6 @@
             .thumb-item-wrapper { flex: 0 0 120px; }
             .thumb-overlay { display: none; }
 
-            .info-box { width: 100%; padding: 16px; transform: translateY(0); max-height: none; margin-top: 0; flex-shrink: 0; }
-            .info-title { font-size: 1.25rem; margin-bottom: 6px; }
-            .info-category { font-size: 0.8rem; margin-bottom: 6px; }
-            .info-meta { margin-bottom: 10px; padding-bottom: 10px; font-size: 0.85rem; }
-            .info-desc { font-size: 0.9rem; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
-            .estimate-btn { padding: 12px 0; font-size: 1rem; }
-            
             .services-section { justify-content: flex-start !important; padding-top: 115px !important; padding-bottom: 40px !important; }
             
             /* [간격 조절] 서비스 메인 타이틀(Services) <-> 전문 촬영 타이틀 */
@@ -654,6 +674,11 @@
                             <button class="btn-close-detail" id="btn-close-detail" title="그리드 뷰로 돌아가기">
                                 <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                             </button>
+                            <!-- 💡 모바일 전용: 설명 펼쳐보기 버튼 -->
+                            <button class="btn-expand-detail" id="btn-expand-detail" title="설명 펼치기">
+                                <svg viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
+                            </button>
+
                             <div class="info-category" id="info-category">Category</div>
                             <h2 class="info-title" id="info-title">Title</h2>
                             <div class="info-meta">
@@ -778,10 +803,11 @@
             const wWidth = rect.width;
             const wHeight = rect.height;
 
-            const baseHeight = wWidth < 768 ? wWidth * 0.25 : Math.min(512, wWidth * 0.22, wHeight * 0.35);
+            // 💡 [모바일 로고 크기 축소 픽스] 0.25에서 0.22로 90% 정도 크기 축소 반영
+            const baseHeight = wWidth < 768 ? wWidth * 0.22 : Math.min(512, wWidth * 0.22, wHeight * 0.35);
             const wideWidth = baseHeight * (424.55 / 186.72); 
             const cx = wWidth / 2, cy = wHeight / 2;
-            const gapX = wWidth < 768 ? 3 : 19.2, lineGapY = wWidth < 768 ? 12 : 24; 
+            const gapX = wWidth < 768 ? 2 : 19.2, lineGapY = wWidth < 768 ? 10 : 24; 
             const totalRowWidth = wideWidth + baseHeight * 2 + gapX * 2;
             const rowLeftEdge = cx - totalRowWidth / 2;
 
@@ -846,7 +872,8 @@
                     });
                 }, 50);
                 setTimeout(() => {
-                    targetMaskRadius = window.innerWidth <= 768 ? 80 : 140; 
+                    // 💡 [모바일 마스크 원형 크기 축소 픽스] 80에서 40으로 절반 축소 반영
+                    targetMaskRadius = window.innerWidth <= 1024 ? 40 : 140; 
                     instruction.style.top = `${targetPositions[3].y + baseHeight / 2 + 70}px`;
                     instruction.style.opacity = '1'; 
                     page1.style.pointerEvents = 'auto';
@@ -980,8 +1007,6 @@
         document.querySelectorAll('.side-letter').forEach(letter => {
             letter.addEventListener('click', (e) => {
                 e.preventDefault();
-                
-                // 💡 [iOS 스크롤 버그 픽스] 스내핑 잠시 끄기
                 document.documentElement.style.scrollSnapType = 'none';
                 document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
                 setTimeout(() => { document.documentElement.style.scrollSnapType = 'y mandatory'; }, 800);
@@ -1037,14 +1062,17 @@
                 e.preventDefault(); 
                 isClickScrolling = true;
                 const targetId = link.getAttribute('data-target');
+                
+                // 💡 [버그 픽스] 다른 메뉴로 이동할 때 모바일 디테일 뷰를 강제로 닫음
+                if (targetId !== 'portfolio' && typeof window.forceClosePortfolioDetail === 'function') {
+                    window.forceClosePortfolioDetail();
+                }
+
                 syncSideSubMenus(targetId);
                 const targetSection = document.getElementById(targetId);
-                
                 if (targetSection) {
-                    // 💡 [iOS 스크롤 버그 픽스] 스내핑 일시 해제 후 이동
                     document.documentElement.style.scrollSnapType = 'none';
                     targetSection.scrollIntoView({ behavior: 'smooth' });
-                    
                     setTimeout(() => { 
                         document.documentElement.style.scrollSnapType = 'y mandatory';
                         isClickScrolling = false; 
@@ -1060,6 +1088,14 @@
                 if (entry.isIntersecting) {
                     const id = entry.target.getAttribute('id');
                     if (id && currentActiveSection !== id) {
+                        
+                        // 💡 [버그 픽스] 스크롤로 다른 섹션에 넘어갈 때도 모바일 디테일 뷰를 초기화
+                        if (currentActiveSection === 'portfolio' && id !== 'portfolio') {
+                             if (typeof window.forceClosePortfolioDetail === 'function') {
+                                 window.forceClosePortfolioDetail();
+                             }
+                        }
+
                         currentActiveSection = id;
                         syncSideSubMenus(id);
                         if (id === 'portfolio' && typeof resetPortfolio === 'function') resetPortfolio();
@@ -1096,6 +1132,17 @@
             let itemsPerPage = 6; 
             let curPage = 1;
 
+            // 💡 [글로벌 함수 노출] 모바일 환경의 디테일 뷰를 언제든 그리드 뷰로 강제 초기화하는 기능
+            window.forceClosePortfolioDetail = function() {
+                if(window.innerWidth > 1024) return;
+                PortDOM.container.classList.remove('view-mode-detail');
+                PortDOM.container.classList.add('view-mode-grid');
+                PortDOM.player.src = 'about:blank';
+                PortDOM.info.classList.remove('is-expanded'); // 펼침 상태도 초기화
+                const expandBtn = document.getElementById('btn-expand-detail');
+                if(expandBtn) expandBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>';
+            };
+
             function syncFilters(val) {
                 PortDOM.filterWrap.querySelectorAll('.category-tab').forEach(b => {
                     if(b.dataset.filter === val) b.classList.add('active'); else b.classList.remove('active');
@@ -1115,14 +1162,20 @@
                 renderThumbnails(); 
                 
                 if (PortDOM.container.classList.contains('view-mode-detail')) {
-                    if(curData.length > 0) {
-                        curIdx = 0; 
-                        PortDOM.videoWrap.classList.add('no-transition', 'slide-in-from-right');
-                        setTimeout(() => { PortDOM.videoWrap.classList.remove('no-transition', 'slide-in-from-right'); PortDOM.videoWrap.classList.add('slide-center'); loadVideo(curData[0]); }, 50);
+                    if (window.innerWidth <= 1024) {
+                        // 모바일: 카테고리를 누르면 무조건 그리드뷰(영상 목록)로 빠져나가도록 수정
+                        window.forceClosePortfolioDetail();
                     } else {
-                        PortDOM.container.classList.remove('view-mode-detail');
-                        PortDOM.container.classList.add('view-mode-grid');
-                        PortDOM.player.src = 'about:blank';
+                        // PC: 카테고리를 바꿔도 영상 디테일 뷰를 유지하며 첫번째 영상을 띄워줌
+                        if(curData.length > 0) {
+                            curIdx = 0; 
+                            PortDOM.videoWrap.classList.add('no-transition', 'slide-in-from-right');
+                            setTimeout(() => { PortDOM.videoWrap.classList.remove('no-transition', 'slide-in-from-right'); PortDOM.videoWrap.classList.add('slide-center'); loadVideo(curData[0]); }, 50);
+                        } else {
+                            PortDOM.container.classList.remove('view-mode-detail');
+                            PortDOM.container.classList.add('view-mode-grid');
+                            PortDOM.player.src = 'about:blank';
+                        }
                     }
                 } else {
                     PortDOM.player.src = 'about:blank'; 
@@ -1140,13 +1193,25 @@
             document.querySelectorAll('#submenu-portfolio .sub-link').forEach(btn => {
                 btn.addEventListener('click', e => {
                     e.preventDefault(); applyFilter(e.target.dataset.filter);
-                    
-                    // 💡 [iOS 스크롤 버그 픽스]
                     document.documentElement.style.scrollSnapType = 'none';
                     document.getElementById('portfolio').scrollIntoView({ behavior: 'smooth' });
                     setTimeout(() => { document.documentElement.style.scrollSnapType = 'y mandatory'; }, 800);
                 });
             });
+
+            // 💡 [버그 픽스] Portfolio 메인 타이틀을 눌러도 디테일 뷰에서 그리드 뷰로 나가지게 연동
+            const mobileTitle = document.querySelector('#portfolio .section-title');
+            if(mobileTitle) {
+                mobileTitle.addEventListener('click', () => {
+                    if (PortDOM.container.classList.contains('view-mode-detail')) {
+                        if (window.innerWidth <= 1024) {
+                            window.forceClosePortfolioDetail();
+                        } else {
+                            PortDOM.closeBtn.click();
+                        }
+                    }
+                });
+            }
 
             resetPortfolio = () => { applyFilter('All'); };
 
@@ -1214,8 +1279,8 @@
             }
 
             function loadVideo(item) {
-                // 기본 음량 조절은 JS API 연동 없이 iframe 파라미터로 불가능하므로, 영상 기본 음량을 존중하여 켬(mute=0)으로 둡니다.
-                PortDOM.player.src = `https://www.youtube.com/embed/${item.id}?rel=0&autoplay=1&mute=0&controls=1&showinfo=0`;
+                // 💡 [기능 픽스] 자바스크립트로 유튜브 재생을 멈추기 위해 enablejsapi=1 옵션 추가
+                PortDOM.player.src = `https://www.youtube.com/embed/${item.id}?rel=0&autoplay=1&mute=0&controls=1&showinfo=0&enablejsapi=1`;
                 PortDOM.iCat.textContent = item.category; PortDOM.iTitle.textContent = item.title; 
                 PortDOM.iClient.textContent = item.client; PortDOM.iDate.textContent = item.date;
                 PortDOM.iDesc.innerHTML = item.desc; 
@@ -1274,18 +1339,34 @@
             PortDOM.prev.addEventListener('click', () => { if(curData.length<=1 || isAnim) return; curIdx = (curIdx - 1 + curData.length) % curData.length; slideVid(curData[curIdx], 'prev'); });
             PortDOM.next.addEventListener('click', () => { if(curData.length<=1 || isAnim) return; curIdx = (curIdx + 1) % curData.length; slideVid(curData[curIdx], 'next'); });
 
+            // PC 닫기 버튼 로직
             PortDOM.closeBtn.addEventListener('click', () => {
                 PortDOM.container.classList.remove('view-mode-detail');
                 PortDOM.container.classList.add('view-mode-grid');
                 PortDOM.player.src = 'about:blank'; 
             });
 
+            // 💡 [기능 픽스] 모바일 전용 설명 펼치기 화살표 동작 이벤트 추가
+            const expandBtn = document.getElementById('btn-expand-detail');
+            if(expandBtn) {
+                expandBtn.addEventListener('click', () => {
+                    PortDOM.info.classList.toggle('is-expanded');
+                    if (PortDOM.info.classList.contains('is-expanded')) {
+                        // 펼쳐질 때 영상 일시정지 명령 전송 및 화살표 위로 변경
+                        PortDOM.player.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+                        expandBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"/></svg>';
+                    } else {
+                        // 닫힐 때 화살표 아래로 변경
+                        expandBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>';
+                    }
+                });
+            }
+
             PortDOM.estimateBtn.addEventListener('click', () => {
                 const item = curData[curIdx];
                 const linkInput = document.getElementById('referenceLink');
                 linkInput.value = `https://www.youtube.com/watch?v=${item.id}`;
                 
-                // 💡 [iOS 스크롤 버그 픽스]
                 document.documentElement.style.scrollSnapType = 'none';
                 document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
                 setTimeout(() => { document.documentElement.style.scrollSnapType = 'y mandatory'; }, 800);
@@ -1379,7 +1460,6 @@
                     currentServiceIdx = serviceKeys.indexOf(e.target.dataset.targetId);
                     changeState(e.target.dataset.targetId);
                     
-                    // 💡 [iOS 스크롤 버그 픽스]
                     document.documentElement.style.scrollSnapType = 'none';
                     document.getElementById('services').scrollIntoView({ behavior: 'smooth' });
                     setTimeout(() => { document.documentElement.style.scrollSnapType = 'y mandatory'; }, 800);
