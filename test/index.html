@@ -729,10 +729,8 @@
 
             <div class="contact-wrapper">
                 <div class="contact-container">
-                    <form action="https://formsubmit.co/moldoo.studio@gmail.com" method="POST" class="contact-form" id="contactForm">
-                        <!-- 메일 전송 후 다시 현재 웹페이지로 돌아오게 하는 숨김 옵션 -->
-                        <input type="hidden" name="_next" value="https://원하시는웹사이트주소.com">
-                        <!-- 스팸 방지 캡차(로봇이 아닙니다) 끄기 옵션 (선택사항) -->
+                    <form class="contact-form" id="contactForm">
+                        <!-- 이동 방지를 위해 JS가 처리하므로 폼 속성을 최소화합니다. -->
                         <input type="hidden" name="_captcha" value="false">
                         <div class="form-group">
                             <label for="name">이름 / 회사명</label>
