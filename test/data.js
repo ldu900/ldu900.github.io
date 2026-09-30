@@ -14,6 +14,14 @@ const SITE_DATA = {
             "desc": "유튜브 편집 위주의 포트폴리오 영상입니다.<br><br>[편집 내용]<br>-모션 그래픽<br>-속도감 있는 컷편집<br>-컬러그레이딩<br>-사운드 디자인<br>-자막 디자인"
         },
         {
+            "id": "3MgYao5MDCg",
+            "category": "스케치",
+            "title": "경희대학교 축제 리캡 영상",
+            "client": "경희대학교",
+            "date": "2026.05.27~29",
+            "desc": "경희대학교 축제 RECAP"
+        },
+        {
             "id": "xrfzs9-UkZM",
             "category": "인터뷰",
             "title": "별별직업(자체 콘텐츠)",
@@ -30,20 +38,44 @@ const SITE_DATA = {
             "desc": ""
         },
         {
-            "id": "pC7Xsi3c9UQ",
-            "category": "AI",
-            "title": "AI 제작 뮤직비디오",
-            "client": "개인",
-            "date": "26.01",
-            "desc": ""
-        },
-        {
             "id": "aveMkDUFdGU",
             "category": "제품",
             "title": "프롬에떼 제품 영상",
             "client": "프롬에떼",
             "date": "26.",
             "desc": "프롬에떼 화장품 신제품 홍보 영상입니다."
+        },
+        {
+            "id": "PG2hNmm2SYs",
+            "category": "홍보",
+            "title": "하이브로 드래곤빌리지 홍보영상",
+            "client": "HIGHBROW",
+            "date": "2026.08.05",
+            "desc": "드래곤빌리지 홍보영상"
+        },
+        {
+            "id": "es1msBPHj0Y",
+            "category": "모션그래픽",
+            "title": "핀스낵 모션그래픽 애니메이션",
+            "client": "핀스낵",
+            "date": "2026.07.14",
+            "desc": "핀스낵 모션그래픽 애니메이션 영상"
+        },
+        {
+            "id": "7fXO_AaWMN0",
+            "category": "스케치",
+            "title": "달밤 - 배다해｜메이킹 영상",
+            "client": "",
+            "date": "",
+            "desc": ""
+        },
+        {
+            "id": "pC7Xsi3c9UQ",
+            "category": "AI",
+            "title": "AI 제작 뮤직비디오",
+            "client": "개인",
+            "date": "26.01",
+            "desc": ""
         },
         {
             "id": "_dleG7O2WLA",
@@ -62,12 +94,20 @@ const SITE_DATA = {
             "desc": ""
         },
         {
-            "id": "7fXO_AaWMN0",
-            "category": "스케치",
-            "title": "달밤 - 배다해｜메이킹 영상",
-            "client": "",
-            "date": "",
-            "desc": ""
+            "id": "mq0IaAiUUT0",
+            "category": "제품",
+            "title": "Avenue2z 제품 영상",
+            "client": "Avenue2z",
+            "date": "2026.07.22",
+            "desc": "제품 홍보 영상"
+        },
+        {
+            "id": "sv3O0L-V1vQ",
+            "category": "인터뷰",
+            "title": "POLED 인터뷰 영상",
+            "client": "POLED",
+            "date": "2026.09.16",
+            "desc": "폴레드 기업 인터뷰 홍보 영상"
         },
         {
             "id": "DIQsOO2zMQ4",
