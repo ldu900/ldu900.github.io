@@ -15,7 +15,7 @@ const SITE_DATA = {
         },
         {
             "id": "3MgYao5MDCg",
-            "category": "스케치",
+            "category": "행사",
             "title": "경희대학교 축제 리캡 영상",
             "client": "경희대학교",
             "date": "2026.05.27~29",
@@ -30,11 +30,35 @@ const SITE_DATA = {
             "desc": "MOLDOO에서 자체적으로 제작한 인터뷰 영상입니다."
         },
         {
+            "id": "V00gTGKGfeE",
+            "category": "AI",
+            "title": "영양군 고춧가루 홍보 영상",
+            "client": "영양군",
+            "date": "26.09",
+            "desc": ""
+        },
+        {
+            "id": "3blSMekEGr0",
+            "category": "제품",
+            "title": "영양군 고춧가루 홍보 영상",
+            "client": "영양군",
+            "date": "26.09",
+            "desc": ""
+        },
+        {
             "id": "szfqDUz8jPM",
             "category": "인터뷰",
             "title": "올리지오 학회 인터뷰 영상",
             "client": "wontech",
             "date": "",
+            "desc": ""
+        },
+        {
+            "id": "6wsQaPmsPd4",
+            "category": "홍보",
+            "title": "세렌디 X 서울브루어리 이벤트 홍보 영상",
+            "client": "세렌디",
+            "date": "26.07",
             "desc": ""
         },
         {
