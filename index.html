@@ -1,16 +1,1484 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Moldoo STUDIO</title>
-  <script type="module" crossorigin src="/assets/index-DPjheDU8.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-Dz5wohZM.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOLDOO | Creative Studio</title>
+    <!-- Pretendard 웹폰트 로드 -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <!-- 물리 엔진 라이브러리 (Matter.js) 로드 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <style>
+        /* 글로벌 초기화 및 스케일링 설정 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html { 
+            font-size: 0.62499vw; 
+            scroll-behavior: smooth; 
+            scroll-snap-type: y mandatory;
+        }
+
+        @media (max-width: 1024px) {
+            html { font-size: 16px; } 
+        }
+
+        :root {
+            --bg-color: rgb(255, 255, 255);
+            --text-color: rgb(17, 17, 17);
+            --accent-color: #ec6300; 
+            --contact-bg: transparent;
+            --contact-border: transparent;
+            --input-bg: transparent;
+            --input-border: rgba(0, 0, 0, 0.2);
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+            font-weight: 400;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: clip; 
+            transition: background-color 0.1s, color 0.1s;
+        }
+
+        body.no-scroll { overflow: hidden; }
+
+        /* =========================================
+           [PAGE 1] 메가 로고 오프닝
+        ========================================= */
+        .page-1 {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
+            z-index: 9000; background: #0e0f0f; cursor: pointer;
+            transition: opacity 0.6s ease;
+        }
+        .cover-content { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9001; pointer-events: none; }
+        .physics-logo-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: opacity 0.3s ease; }
+        .letter { position: absolute; top: 0; left: 0; color: var(--accent-color); transform-origin: center center; opacity: 0; }
+        .letter svg { width: 100%; height: 100%; display: block; }
+        .instruction-text {
+            position: absolute; left: 50%; transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.9); font-size: 1.15rem; font-weight: 500; letter-spacing: 1px;
+            opacity: 0; transition: opacity 0.5s ease; animation: pulse 2.5s infinite ease-in-out;
+            background: rgba(0, 0, 0, 0.55); padding: 14px 28px; border-radius: 30px;
+            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15);
+            white-space: nowrap; box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: none;
+        }
+        @keyframes pulse {
+            0% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-4px); }
+            100% { transform: translateX(-50%) translateY(0); }
+        }
+
+        /* =========================================
+           글로벌 고정 UI (로고 & 좌측 메뉴)
+        ========================================= */
+        .logo-wrapper {
+            position: fixed; top: 50px; left: 50px; z-index: 150;
+            transition: transform 0.3s ease, top 0.3s ease, left 0.3s ease;
+        }
+        .sidebar-logo { display: flex; flex-direction: column; gap: 4px; color: var(--text-color); cursor: pointer; transition: color 0.3s ease; }
+        .sidebar-logo-row { display: flex; gap: 4px; height: 34px; }
+        .side-letter { height: 100%; transition: transform 0.1s ease, color 0.2s ease; }
+        .side-letter svg { height: 100%; width: auto; display: block; }
+        .side-letter:active { transform: scale(0.85); color: #ffd6b8; filter: drop-shadow(0 0 8px rgba(236, 99, 0, 0.8)); }
+
+        .menu-wrapper {
+            position: fixed; top: 160px; left: 50px; z-index: 150;
+            transition: transform 0.3s ease, top 0.3s ease, left 0.3s ease;
+        }
+        .floating-menu { display: flex; flex-direction: column; align-items: flex-start; }
+        .menu-list { display: flex; flex-direction: column; gap: 15px; width: 100%; list-style: none; }
+        
+        .nav-item { display: flex; flex-direction: column; width: 100%; }
+        .nav-link {
+            position: relative; text-decoration: none; color: #888888;
+            font-size: 18px; 
+            font-weight: 500; padding-left: 20px; 
+            transition: font-weight 0.2s ease, color 0.2s ease; display: flex; align-items: center; cursor: pointer;
+        }
+        .active-dot {
+            position: absolute; left: 0; width: 8px; height: 8px;
+            background-color: var(--accent-color); border-radius: 50%;
+            opacity: 0; transform: scale(0); transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .nav-link.active { color: var(--text-color); font-weight: 700; }
+        .nav-link.active .active-dot { opacity: 1; transform: scale(1); }
+        .nav-link:hover { color: var(--accent-color); }
+
+        .sub-menu {
+            display: flex; flex-direction: column; gap: 10px; margin-top: 0; padding-left: 20px;
+            max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.4s ease, opacity 0.4s ease, margin 0.4s ease;
+        }
+        .nav-link.active + .sub-menu { max-height: 300px; opacity: 1; margin-top: 15px; }
+        .sub-link {
+            background: none; border: none; color: #888; text-align: left; cursor: pointer; 
+            font-size: 15px; 
+            font-family: inherit; font-weight: 500; transition: color 0.2s; white-space: nowrap;
+        }
+        .sub-link:hover, .sub-link.active { color: var(--accent-color); font-weight: 700; }
+
+        .mobile-header-bg { display: none; }
+
+        /* =========================================
+           [공통 레이아웃] 
+        ========================================= */
+        .scroll-section { scroll-snap-align: start; scroll-snap-stop: always; height: 100vh; height: 100dvh; width: 100%; }
+        
+        .section-padding { 
+            padding: 10rem 2.5rem 3.75rem 2.5rem; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; 
+        }
+        
+        .section-header { 
+            position: absolute; top: 3.125rem; left: 50%; transform: translateX(-50%); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            width: 100%; gap: 1.875rem; z-index: 110; text-align: center; margin-bottom: 0;
+            pointer-events: none;
+        }
+        .section-header > * { pointer-events: auto; }
+        
+        .section-title, .contact-title { 
+            font-size: 2.8rem; font-weight: 600; color: var(--text-color); letter-spacing: -0.5px; line-height: 1.2;
+        }
+
+        /* =========================================
+           [SECTION 1] About Us
+        ========================================= */
+        .about-section { position: relative; z-index: 10; overflow: visible; display: flex; align-items: center; justify-content: center;}
+        
+        .spotlight-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;
+            display: flex; align-items: flex-start; justify-content: center;
+            opacity: 1; will-change: opacity, transform; transition: opacity 0.3s ease;
+        }
+        
+        .svg-wrapper {
+            margin-top: -3.3125rem; width: max(122vw, 75rem); flex-shrink: 0; opacity: 0.9;
+            transform-origin: center top; will-change: transform;
+        }
+        .svg-wrapper svg { width: 100%; height: auto; display: block; }
+        
+        .main-title {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: clamp(1.6rem, 3.2vw, 2.4rem); font-weight: 400 !important; 
+            color: #ffffff !important; letter-spacing: -0.5px; white-space: nowrap; 
+            z-index: 10; will-change: transform, opacity; text-shadow: none !important;
+        }
+
+        /* =========================================
+           [SECTION 2] Portfolio Grid & Detail
+        ========================================= */
+        .category-tabs { display: flex; justify-content: center; gap: 2.5rem; align-items: center; width: 100%; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; -ms-overflow-style: none; }
+        .category-tabs::-webkit-scrollbar { display: none; }
+        .category-tab { background: transparent; border: none; padding: 0; color: #ffffff; opacity: 1; cursor: pointer; font-weight: 400; font-size: 1.3rem; transition: all 0.3s ease; font-family: inherit; white-space: nowrap; flex-shrink: 0; }
+        .category-tab.active, .category-tab:hover { color: var(--accent-color); opacity: 1; font-weight: 400; }
+
+        .portfolio-section { background-color: transparent; z-index: 20; overflow: hidden; padding-top: 3.75rem; }
+        
+        .view-container { flex: 1; position: relative; width: 100%; max-width: 87.5rem; min-height: 0; pointer-events: auto; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        
+        .grid-view-wrapper { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 5; opacity: 1; transition: opacity 0.4s ease; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        
+        .grid-view { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.625rem; width: 100%; max-width: 77.5rem; align-content: center; }
+        
+        .pagination { position: absolute; bottom: 5rem; left: 50%; transform: translateX(-50%); display: flex; justify-content: center; gap: 1.25rem; z-index: 20; }
+        .page-num { background: transparent; color: var(--text-color); border: none; border-bottom: 2px solid transparent; width: auto; height: auto; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; font-weight: 700; font-size: 1.3rem; padding-bottom: 4px; border-radius: 0; }
+        .page-num.active, .page-num:hover { background: transparent; border-bottom-color: var(--accent-color); color: var(--accent-color); transform: none; }
+
+        .grid-item-wrapper { display: flex; flex-direction: column; gap: 0; cursor: pointer; scroll-snap-align: start; }
+        .grid-item { position: relative; border-radius: 0; overflow: hidden; background: #111; transform-origin: center center; transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s; padding-bottom: 56.25%; }
+        .grid-item-wrapper:hover .grid-item { transform: scale(1.02); box-shadow: 0 10px 30px rgba(236, 99, 0, 0.3); z-index: 10; }
+        .grid-item img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: filter 0.3s; }
+        
+        .grid-item-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; padding: 1rem; z-index: 5; }
+        @media (hover: hover) { .grid-item:hover .grid-item-overlay { opacity: 1; } }
+        .grid-item.touch-active .grid-item-overlay { opacity: 1; }
+        .overlay-title { color: #fff; font-size: clamp(0.9rem, 1.5vw, 1.2rem); font-weight: 700; text-align: center; line-height: 1.4; word-break: keep-all; }
+
+        .detail-view { 
+            position: absolute; top: 0; left: calc(50% - 50vw); width: 100vw; height: 100%;
+            display: flex; flex-direction: column; gap: 2.5rem; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transform: scale(0.95); 
+            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 1; 
+        }
+        .view-mode-grid .grid-view-wrapper { opacity: 1; pointer-events: auto; transform: scale(1); z-index: 5; }
+        .view-mode-grid .detail-view { opacity: 0; pointer-events: none; transform: scale(0.95); z-index: 1; }
+        .view-mode-detail .grid-view-wrapper { opacity: 0; pointer-events: none; transform: scale(1.05); z-index: 1; }
+        .view-mode-detail .detail-view { opacity: 1; pointer-events: auto; transform: scale(1); z-index: 5; }
+
+        .detail-view-top { 
+            display: flex; gap: 1.5rem; width: 100%; max-width: 87.5rem; margin: 0 auto; 
+            align-items: stretch; 
+        }
+        .video-player-wrapper { 
+            flex: 1; min-width: 0; position: relative; width: 100%; height: auto; aspect-ratio: 16 / 9; max-height: 100%; 
+            background: #000; border-radius: 0; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); 
+            transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.4s; z-index: 2; pointer-events: auto; 
+        }
+        .video-player-wrapper iframe { width: 100%; height: 100%; border: none; background-color: #111; pointer-events: auto; }
+        
+        .info-box { 
+            width: 23.75rem; flex-shrink: 0; height: auto; align-self: stretch; 
+            background: rgba(25, 25, 25, 0.6); border-radius: 0.75rem; padding: 2rem; display: flex; flex-direction: column; 
+            border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(24px); overflow-y: auto; color: #fff; 
+            transform: translateX(1.25rem); transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.6s cubic-bezier(0.77, 0, 0.175, 1); position: relative; 
+        }
+        
+        .btn-close-detail { position: absolute; top: 1.25rem; right: 1.25rem; width: 2rem; height: 2rem; background: rgba(255,255,255,0.1); border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; z-index: 100; }
+        .btn-close-detail svg { width: 1rem; height: 1rem; fill: #fff; transition: 0.3s; }
+        .btn-close-detail:hover { background: var(--accent-color); }
+        
+        /* 모바일 전용 펼치기 버튼 (PC에서는 숨김) */
+        .btn-expand-detail { display: none; }
+
+        .view-mode-detail .info-box { transform: translateX(0); }
+        .info-category { color: var(--accent-color); font-size: 0.85rem; font-weight: 700; margin-bottom: 0.75rem; text-transform: uppercase;}
+        .info-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 1rem; line-height: 1.3; padding-right: 1.25rem; word-break: keep-all; }
+        .info-meta { display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .meta-item { display: flex; gap: 0.5rem; font-size: 0.9rem; align-items: center;}
+        .meta-label { color: #888; font-weight: 700; }
+        .meta-value { color: #ddd; font-weight: 500; }
+        .meta-divider { width: 1px; height: 12px; background: rgba(255,255,255,0.2); }
+        .info-desc { font-size: 0.95rem; color: #aaa; font-weight: 500; line-height: 1.6; white-space: pre-line; margin-bottom: 2rem; }
+        
+        .estimate-btn { margin-top: auto; width: 100%; background-color: var(--accent-color); color: #ffffff; border: none; border-radius: 0.5rem; padding: 1rem 0; font-size: 1.05rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(236, 99, 0, 0.3); }
+        .estimate-btn:hover { transform: translateY(-2px); background-color: #d15600; box-shadow: 0 6px 20px rgba(236, 99, 0, 0.5); }
+
+        .nav-arrow-container { 
+            position: absolute; top: 15%; bottom: 20%; left: 0; right: 0; height: auto; 
+            display: flex; justify-content: space-between; z-index: 20; pointer-events: none; 
+        }
+        .nav-arrow { 
+            position: relative; width: 35%; height: 100%; display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; opacity: 0; transition: opacity 0.3s ease; pointer-events: auto; 
+        }
+        .nav-arrow.left { background: linear-gradient(to right, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%); justify-content: flex-start; padding-left: 5%; }
+        .nav-arrow.right { background: linear-gradient(to left, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%); justify-content: flex-end; padding-right: 5%; }
+        .nav-arrow:hover { opacity: 1; }
+        .nav-arrow svg { position: relative; z-index: 20; width: 3.125rem; height: 3.125rem; fill: white; transition: transform 0.2s, fill 0.2s; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); pointer-events: none; }
+        .nav-arrow:hover svg { transform: scale(1.2); fill: var(--accent-color); }
+
+        .thumbnail-strip-wrapper { 
+            position: relative; transition: opacity 0.3s, transform 0.3s; pointer-events: auto; 
+            width: 100%; max-width: 87.5rem; margin: 0 auto; 
+        }
+        .thumbnail-strip-wrapper::before { 
+            content: ''; position: absolute; top: 0; left: -25px; bottom: 0; width: 50px; 
+            background: linear-gradient(to right, var(--bg-color) 20%, transparent); 
+            pointer-events: none; z-index: 10; 
+        }
+        .thumbnail-strip-wrapper::after { 
+            content: ''; position: absolute; top: 0; right: -25px; bottom: 0; width: 50px; 
+            background: linear-gradient(to left, var(--bg-color) 20%, transparent); 
+            pointer-events: none; z-index: 10; 
+        }
+        
+        .view-mode-grid .thumbnail-strip-wrapper { opacity: 0; pointer-events: none; transform: translateY(20px); height: 0; overflow: hidden; margin-top: 0; }
+        .view-mode-detail .thumbnail-strip-wrapper { opacity: 1; pointer-events: auto; transform: translateY(0); height: auto; }
+        
+        .thumbnail-strip { 
+            display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 0.625rem; scrollbar-width: none; 
+            margin-left: -25px; padding-left: 25px;
+            margin-right: -25px; padding-right: 25px;
+        }
+        .thumbnail-strip::-webkit-scrollbar { display: none; }
+        .thumb-item-wrapper { flex: 0 0 16.25rem; display: flex; flex-direction: column; gap: 0.5rem; cursor: pointer; scroll-snap-align: start; }
+        
+        .thumb-item { width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 0; overflow: hidden; transition: 0.2s; border: 2px solid transparent; background-color: #222; position: relative; }
+        .thumb-item img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+        .thumb-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; padding: 0.625rem; text-align: center; }
+        .thumb-title-text { font-size: 0.9rem; color: #fff; font-weight: 700; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; }
+        
+        .thumb-item-wrapper:hover .thumb-overlay { opacity: 1; }
+        .thumb-item-wrapper.active .thumb-item { border-color: var(--accent-color); opacity: 1; }
+        .thumb-item-wrapper.active .thumb-overlay { opacity: 1; background: rgba(236, 99, 0, 0.4); }
+
+        .slide-out-left { transform: translateX(-150%) scale(0.95); opacity: 0; }
+        .slide-out-right { transform: translateX(150%) scale(0.95); opacity: 0; }
+        .slide-in-from-right { transform: translateX(150%) scale(0.95); opacity: 0; }
+        .slide-in-from-left { transform: translateX(-150%) scale(0.95); opacity: 0; }
+        .slide-center { transform: translateX(0) scale(1); opacity: 1; }
+        .no-transition { transition: none !important; }
+
+        /* =========================================
+           [SECTION 3] Services 
+        ========================================= */
+        .services-section { position: relative; z-index: 30; overflow: hidden; }
+        .hero-bgs { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background-color: #0e0f0f; }
+        .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.8s ease-in-out; filter: brightness(0.6) contrast(1.1); will-change: opacity; }
+        .hero-bg.active { opacity: 1; }
+        .hero-gradient { position: absolute; bottom: 0; left: 0; width: 100%; height: 80vh; background: linear-gradient(to top, var(--bg-color) 10%, transparent 100%); z-index: 1; pointer-events: none; }
+        
+        .hero-content { position: relative; z-index: 10; max-width: 50rem; padding-bottom: 1.25rem; text-align: center; }
+        .hero-title { font-size: 2.2rem; font-weight: 600; color:var(--text-color); margin-bottom: 0.9375rem; letter-spacing: -1px; transition: opacity 0.4s ease, transform 0.4s ease; word-break: keep-all; }
+        .hero-desc { font-size: 1.3rem; font-weight: 400; color: var(--text-color); opacity: 0.85; line-height: 1.6; word-break: keep-all; transition: opacity 0.4s ease, transform 0.4s ease; min-height: 4em; } 
+        
+        .posters-section { position: relative; z-index: 20; width: 100%; max-width: 87.5rem; padding-bottom: 1.25rem; }
+        .posters-track { display: flex; justify-content: center; gap: 1.5rem; padding: 1.25rem 2.5rem 2.5rem 2.5rem; scrollbar-width: none; flex-wrap: wrap; }
+        .posters-track::-webkit-scrollbar { display: none; }
+        .poster-item { flex: 0 0 clamp(10rem, 15vw, 13.75rem); aspect-ratio: 2 / 3; position: relative; border-radius: 0.75rem; overflow: hidden; cursor: pointer; background: #1a1a1a; border: 2px solid transparent; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease, border-color 0.4s ease; }
+        .poster-item:hover { transform: scale(1.08) translateY(-10px); box-shadow: 0 15px 40px rgba(236, 99, 0, 0.6); border-color: rgba(236, 99, 0, 0.8); z-index: 30; }
+        .poster-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: filter 0.5s ease, transform 0.5s ease; pointer-events: none; }
+        .poster-item:hover .poster-img { filter: brightness(1.1); transform: scale(1.05); }
+        .poster-overlay { position: absolute; bottom: -2px; left: -2px; right: -2px; width: auto; height: calc(50% + 4px); background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 50%, transparent 100%); display: flex; align-items: flex-end; padding: 1.25rem; pointer-events: none; border-bottom-left-radius: 0.625rem; border-bottom-right-radius: 0.625rem; }
+        .poster-title { font-size: clamp(1.2rem, 2vw, 1.96rem); font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: -0.5px; transition: color 0.3s ease; }
+        .poster-item:hover .poster-title { color: var(--accent-color); }
+
+        /* =========================================
+           [SECTION 4] Contact Form & Footer
+        ========================================= */
+        .contact-section { 
+            position: relative; z-index: 40; padding-bottom: 6.25rem; transition: background-color 0.3s; overflow: hidden; padding-top: 6.25rem;
+        }
+        .contact-wrapper {
+            width: 100%; max-width: 37.5rem; display: flex; flex-direction: column; align-items: center; margin: 0 auto;
+        }
+        .contact-container { 
+            width: 100%; background: transparent; padding: 0; border-radius: 0; 
+            border: none; box-shadow: none; transition: background 0.3s, border-color 0.3s; 
+        }
+        .contact-desc { font-size: 1.3rem; font-weight: 500; color: var(--text-color); margin-bottom: 3.125rem; transition: color 0.3s; text-align: center; }
+        
+        .contact-form { display: flex; flex-direction: column; gap: 3.125rem; width: 100%; }
+        .form-group { display: flex; flex-direction: column; gap: 0.625rem; }
+        .contact-form label { font-size: 1.3rem; font-weight: 700; color: #888; text-align: center; }
+        .contact-form input, .contact-form select, .contact-form textarea { width: 100%; padding: 0.875rem 1.125rem; font-size: 1.3rem; color: var(--text-color); font-weight: 500; background: transparent; border: 1px solid var(--input-border); border-radius: 0.5rem; outline: none; transition: border-color 0.3s, color 0.3s; font-family: inherit; }
+        .contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus { border-color: var(--accent-color); }
+        .contact-form textarea { resize: vertical; min-height: 7.5rem; }
+        
+        .contact-submit { margin-top: 0.625rem; background: var(--accent-color); color: #fff; border: none; padding: 1.125rem; border-radius: 0.5rem; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(236, 99, 0, 0.3); }
+        .contact-submit:hover { transform: translateY(-3px); background: #d15600; box-shadow: 0 8px 25px rgba(236, 99, 0, 0.5); }
+
+        .footer-info {
+            position: absolute; bottom: 1.875rem; left: 0; right: 0;
+            display: flex; justify-content: center; align-items: center; flex-wrap: nowrap; gap: 0.875rem;
+            color: var(--text-color); opacity: 0.4; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.3px;
+            transition: color 0.3s; pointer-events: none; white-space: nowrap; text-align: center;
+        }
+        .footer-info span { display: inline-flex; align-items: center; }
+        .footer-info span:not(:last-child)::after { content: "|"; opacity: 0.4; margin-left: 0.875rem; }
+
+        /* =========================================
+           [OVERLAY] 이스터에그 (단체사진)
+        ========================================= */
+        #teamOverlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(14, 15, 15, 0.95); z-index: 9999;
+            display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.5s ease;
+            backdrop-filter: blur(15px);
+        }
+        .close-team {
+            position: absolute; top: 40px; right: 40px; background: none; border: none;
+            color: #fff; font-size: 3rem; font-weight: 500; cursor: pointer; transition: color 0.3s ease;
+        }
+        .close-team:hover { color: var(--accent-color); }
+        .team-image { width: 80vw; max-width: 50rem; aspect-ratio: 16/9; object-fit: cover; border-radius: 1.25rem; box-shadow: 0 20px 50px rgba(236, 99, 0, 0.4); transform: scale(0.8); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* =========================================
+           📱 [모바일 대응 반응형 CSS] 
+        ========================================= */
+        @media (max-width: 1024px) {
+            .mobile-header-bg {
+                display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100px;
+                background: #ffffff; border-bottom: 1px solid #e0e0e0;
+                z-index: 140; opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+            }
+            .mobile-header-bg.active { opacity: 1; }
+
+            .logo-wrapper { top: 25px; left: 50%; transform: translateX(-50%) scale(0.52); transform-origin: top center; z-index: 150;}
+            .menu-wrapper { top: 80px; left: 50%; transform: translateX(-50%); width: 100%; padding: 0 20px; z-index: 150;}
+            .menu-list { flex-direction: row; justify-content: center; gap: 30px; flex-wrap: wrap; }
+            .nav-item { width: auto; }
+            .nav-link { font-size: 15px; padding-left: 16px; padding-bottom: 0; }
+            .nav-link .active-dot { top: auto; bottom: auto; left: 0; transform: scale(0); }
+            .nav-link.active .active-dot { transform: scale(1); }
+            .sub-menu { display: none !important; }
+
+            .spotlight-container { align-items: flex-start; padding-top: 0 !important; }
+            .svg-wrapper { margin-top: 115px !important; width: max(200vw, 800px); }
+            .main-title { top: 50% !important; transform: translate(-50%, -50%) !important; }
+
+            .section-padding { padding: 115px 20px 40px 20px !important; justify-content: flex-start !important; }
+            
+            /* 💡 포트폴리오 타이틀 클릭 시 그리드로 나가기 유도용 스타일 */
+            .section-header { position: relative !important; top: 0 !important; left: 0 !important; transform: none !important; width: 100%; }
+            #portfolio .section-title { cursor: pointer; } 
+            
+            .section-title, .contact-title { font-size: 2rem !important; }
+            
+            /* [간격 조절] 포트폴리오 타이틀 <-> 카테고리 탭 */
+            #portfolio .section-header { margin-bottom: 20px !important; }
+
+            .category-tabs { 
+                justify-content: center !important; 
+                flex-wrap: wrap !important; 
+                padding: 0 20px !important; 
+                gap: 15px !important; 
+                width: 100%;
+            }
+            .category-tab { font-size: 0.9rem !important; }
+
+            .portfolio-section { justify-content: flex-start; }
+            
+            .view-container { flex: 1; display: flex; flex-direction: column; width: 100%; align-items: center; }
+            
+            /* [간격 조절] 카테고리 탭 <-> 그리드 뷰(썸네일 영역) */
+            .view-mode-grid .grid-view-wrapper { margin-top: 10px; position: relative; opacity: 1; transform: none; display: flex !important; flex-direction: column; width: 100%; align-items: center; }
+            .view-mode-grid .detail-view { display: none !important; }
+            
+            .view-mode-detail .grid-view-wrapper { display: none !important; }
+            .view-mode-detail .detail-view { position: relative !important; left: 0 !important; width: 100% !important; opacity: 1; transform: none; display: flex !important; flex-direction: column; align-items: center; padding-bottom: 20px; }
+            
+            /* 💡 모바일 디테일 뷰 오버랩 해결 (position: relative) */
+            .detail-view-top { position: relative; flex-direction: column; gap: 15px; width: 100%; max-width: none; align-items: center; margin-top: 20px; }
+            
+            .grid-view { 
+                display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; padding: 0 10px; 
+                align-content: flex-start; min-height: 380px; 
+            } 
+            
+            /* [간격 조절] 그리드 뷰 <-> 하단 페이지 넘버 */
+            .pagination { 
+                position: relative !important; bottom: auto !important; left: 0 !important; 
+                transform: none !important; margin-top: 30px !important; padding-bottom: 20px !important; 
+                width: 100% !important; display: flex; justify-content: center; 
+            }
+
+            .video-player-wrapper { width: 100%; aspect-ratio: 16/9; max-height: none; flex: none; flex-shrink: 0; margin-bottom: 0; }
+            
+            /* 💡 모바일 전용 설명 펼쳐보기 UI 적용 */
+            .btn-close-detail { display: none !important; } /* 기존 닫기 버튼 숨김 */
+            
+            .btn-expand-detail { 
+                display: flex !important; position: absolute; top: 16px; right: 16px; 
+                width: 32px; height: 32px; background: rgba(255,255,255,0.1); 
+                border: none; border-radius: 50%; align-items: center; justify-content: center; cursor: pointer; z-index: 100;
+            }
+            .btn-expand-detail svg { width: 16px; height: 16px; fill: #fff; }
+            .btn-expand-detail:active { background: var(--accent-color); }
+            
+            .info-box { width: 100%; padding: 16px; transform: translateY(0); max-height: none; margin-top: 0; flex-shrink: 0; transition: all 0.4s ease; }
+            
+            /* 접혀있을 땐 긴 설명과 버튼을 가림 */
+            .info-box .info-desc, .info-box .estimate-btn { display: none; }
+            
+            /* 펼쳐진 상태: 화면을 덮음 */
+            .info-box.is-expanded {
+                position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50;
+                background: rgba(25, 25, 25, 0.95); backdrop-filter: blur(20px);
+                display: flex; flex-direction: column; justify-content: flex-start; padding-bottom: 30px;
+            }
+            .info-box.is-expanded .info-desc { display: block; margin-top: 15px; flex: 1; overflow-y: auto; }
+            .info-box.is-expanded .estimate-btn { display: block; margin-top: 20px; flex-shrink: 0; }
+            /* --------------------------------- */
+
+            .info-title { font-size: 1.25rem; margin-bottom: 6px; padding-right: 40px; }
+            .info-category { font-size: 0.8rem; margin-bottom: 6px; }
+            .info-meta { margin-bottom: 10px; padding-bottom: 10px; font-size: 0.85rem; border-bottom: none; }
+            
+            .thumbnail-strip-wrapper { 
+                display: block !important; margin-top: 10px; width: 100vw !important; max-width: none;
+                padding-left: 0 !important; margin-left: -20px !important; margin-right: -20px !important;
+            }
+            .thumbnail-strip-wrapper::before { width: 30px; left: 0; }
+            .thumbnail-strip-wrapper::after { width: 30px; right: 0; }
+            
+            .thumbnail-strip { gap: 10px; padding-bottom: 5px; margin-left: 0; padding-left: 20px; margin-right: 0; padding-right: 20px; }
+            .thumb-item-wrapper { flex: 0 0 120px; }
+            .thumb-overlay { display: none; }
+
+            .services-section { justify-content: flex-start !important; padding-top: 115px !important; padding-bottom: 40px !important; }
+            
+            /* [간격 조절] 서비스 메인 타이틀(Services) <-> 전문 촬영 타이틀 */
+            #services .section-header { margin-bottom: 120px !important; }
+            
+            .hero-content { display: flex; flex-direction: column; align-items: center; width: 100%; text-align: center; }
+            
+            /* [간격 조절] 서비스 항목 타이틀(전문 촬영) <-> 설명 문구 */
+            .hero-title { font-size: 1.5rem !important; margin-bottom: 8px !important; text-align: center; }
+            
+            /* [간격 조절] 서비스 설명 문구 <-> 썸네일 그룹 */
+            .hero-desc { font-size: 0.9rem !important; line-height: 1.5; min-height: 3em; max-width: 100%; text-align: center; }
+            .hero-content { margin-bottom: 20px !important; padding-bottom: 0 !important; }
+            
+            .posters-section { padding-bottom: 0; overflow: visible !important; }
+            
+            .posters-track { 
+                display: flex !important; flex-wrap: nowrap !important; justify-content: flex-start !important; 
+                gap: 13px !important; 
+                margin: 0 -20px !important; 
+                width: 100vw !important; 
+                padding: 10px 20px 40px 20px !important; 
+                overflow-x: auto !important; scrollbar-width: none; -ms-overflow-style: none;
+            }
+            .posters-track::after { content: ''; flex: 0 0 1px; padding-right: 20px; display: block; } 
+            .poster-item { flex: 0 0 160px !important; max-width: none !important; aspect-ratio: 2/3; }
+            
+            .poster-item:hover, .poster-item:active, .poster-item:focus { transform: none !important; box-shadow: none !important; border-color: rgba(236, 99, 0, 0.8) !important; }
+            .poster-title { font-size: 1.3rem !important; padding: 10px; width: 100%; text-align: center; word-break: keep-all; font-weight: 700; }
+            .poster-overlay { padding: 8px; }
+
+            .contact-section { 
+                height: auto !important; min-height: 100dvh; scroll-snap-align: start; 
+                justify-content: flex-start !important; padding-top: 115px !important;
+            }
+            
+            /* [간격 조절] 컨택트 메인 타이틀(Contact Us) <-> 설명 문구 */
+            .contact-title { margin-bottom: 0px !important; }
+            
+            /* [간격 조절] 컨택트 설명 문구 <-> 아래 폼 영역 */
+            .contact-desc { font-size: 0.9rem !important; margin-bottom: 30px !important; line-height: 1.5; }
+            
+            .contact-wrapper { margin: 0; gap: 20px; }
+            .contact-container { padding: 0 20px; }
+            
+            .contact-form { gap: 20px !important; }
+            .form-group { gap: 6px !important; }
+            .contact-form label { font-size: 0.9rem !important; }
+            .contact-form input, .contact-form select, .contact-form textarea { font-size: 0.9rem !important; padding: 10px 12px !important; }
+            .contact-submit { font-size: 1rem !important; padding: 14px !important; }
+            
+            .footer-info { 
+                position: relative; bottom: auto; left: auto; margin-top: 40px; 
+                width: 100%; text-align: center; white-space: normal; padding: 0 10px;
+                font-size: 0.65rem; gap: 8px; flex-direction: row; flex-wrap: wrap; 
+            }
+            .footer-info span:not(:last-child)::after { margin-left: 8px; }
+        }
+
+        @media (max-width: 480px) {
+            .logo-wrapper { transform: translateX(-50%) scale(0.44); }
+            .menu-list { gap: 24px; }
+            .nav-link { font-size: 14px; padding-left: 12px; }
+            .close-team { top: 20px; right: 20px; font-size: 2.5rem; }
+            
+            .svg-wrapper { margin-top: 5px !important; }
+            .main-title { top: 50% !important; }
+            .poster-item { flex: 0 0 145px !important; }
+            .section-title, .contact-title { font-size: 2.2rem; }
+        }
+    </style>
 </head>
+<body class="no-scroll">
 
-<body>
-	<div id="root"></div>
+    <div class="mobile-header-bg" id="mobileHeaderBg"></div>
+
+    <!-- [PAGE 1] 메가 로고 오프닝 커버 -->
+    <div class="page-1" id="page1">
+        <div class="cover-content">
+            <div class="physics-logo-container" id="logoContainer">
+                <div class="letter" id="letter-M" data-type="rect" data-char="M"><svg viewBox="0 0 424.55 186.72"><polygon fill="currentColor" points="256.56 0 252.75 0 212.19 70.25 171.63 0 161.66 0 0 0 0 186.72 131.07 186.72 131.07 116.46 171.63 186.72 252.75 186.72 293.31 116.46 293.31 186.72 424.55 186.72 424.55 0 256.56 0"/></svg></div>
+                <div class="letter" id="letter-O1" data-type="circle" data-char="O1"><svg viewBox="0 0 186.72 186.72"><circle fill="currentColor" cx="93.36" cy="93.36" r="93.36"/></svg></div>
+                <div class="letter" id="letter-L" data-type="rect" data-char="L"><svg viewBox="0 0 186.72 186.72"><polygon fill="currentColor" points="102.66 89.46 102.66 0 0 0 0 186.72 186.72 186.72 186.72 89.46 102.66 89.46"/></svg></div>
+                <div class="letter" id="letter-D" data-type="rect" data-char="D"><svg viewBox="0 0 424.55 186.72"><path fill="currentColor" d="M416.19,55.63c-5.14-11.05-12.39-20.95-21.56-29.43C376.64,9.55,352.5,0,328.4,0H0v186.72h328.4c12.42,0,24.62-2.4,36.27-7.12,11.26-4.56,21.45-11.08,30.29-19.36,9.09-8.51,16.28-18.44,21.37-29.52,5.45-11.87,8.22-24.47,8.22-37.45s-2.81-25.73-8.36-37.65ZM85.92,106.2v-25.68h21.6v25.68h-21.6ZM335.8,82.68c1.46,1.61,3.91,5.13,3.91,10.6,0,8.66-6.16,14.18-10.41,14.18h-197.43v-28.19h197.43c2.12,0,4.55,1.28,6.49,3.42Z"/></svg></div>
+                <div class="letter" id="letter-O2" data-type="circle" data-char="O2"><svg viewBox="0 0 186.72 186.72"><circle fill="currentColor" cx="93.36" cy="93.36" r="93.36"/></svg></div>
+                <div class="letter" id="letter-O3" data-type="circle" data-char="O3"><svg viewBox="0 0 186.72 186.72"><circle fill="currentColor" cx="93.36" cy="93.36" r="93.36"/></svg></div>
+            </div>
+            <p class="instruction-text" id="instruction">화면 아무곳을 클릭하여 입장하기</p>
+        </div>
+    </div>
+
+    <!-- 좌측 상단 고정 UI (로고, 메뉴) -->
+    <div class="logo-wrapper" id="logoWrapper">
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-row">
+                <div class="side-letter" data-char="M"><svg viewBox="0 0 424.55 186.72"><polygon fill="currentColor" points="256.56 0 252.75 0 212.19 70.25 171.63 0 161.66 0 0 0 0 186.72 131.07 186.72 131.07 116.46 171.63 186.72 252.75 186.72 293.31 116.46 293.31 186.72 424.55 186.72 424.55 0 256.56 0"/></svg></div>
+                <div class="side-letter" data-char="O1"><svg viewBox="0 0 186.72 186.72"><circle fill="currentColor" cx="93.36" cy="93.36" r="93.36"/></svg></div>
+                <div class="side-letter" data-char="L"><svg viewBox="0 0 186.72 186.72"><polygon fill="currentColor" points="102.66 89.46 102.66 0 0 0 0 186.72 186.72 186.72 186.72 89.46 102.66 89.46"/></svg></div>
+            </div>
+            <div class="sidebar-logo-row">
+                <div class="side-letter" data-char="D"><svg viewBox="0 0 424.55 186.72"><path fill="currentColor" d="M416.19,55.63c-5.14-11.05-12.39-20.95-21.56-29.43C376.64,9.55,352.5,0,328.4,0H0v186.72h328.4c12.42,0,24.62-2.4,36.27-7.12,11.26-4.56,21.45-11.08,30.29-19.36,9.09-8.51,16.28-18.44,21.37-29.52,5.45-11.87,8.22-24.47,8.22-37.45s-2.81-25.73-8.36-37.65ZM85.92,106.2v-25.68h21.6v25.68h-21.6ZM335.8,82.68c1.46,1.61,3.91,5.13,3.91,10.6,0,8.66-6.16,14.18-10.41,14.18h-197.43v-28.19h197.43c2.12,0,4.55,1.28,6.49,3.42Z"/></svg></div>
+                <div class="side-letter" data-char="O2"><svg viewBox="0 0 186.72 186.72"><circle fill="currentColor" cx="93.36" cy="93.36" r="93.36"/></svg></div>
+                <div class="side-letter" data-char="O3"><svg viewBox="0 0 186.72 186.72"><circle fill="currentColor" cx="93.36" cy="93.36" r="93.36"/></svg></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 이스터에그 단체사진 오버레이 -->
+    <div id="teamOverlay">
+        <button class="close-team" id="closeTeamBtn">&times;</button>
+        <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800" alt="Team Photo" class="team-image" id="teamImg">
+    </div>
+
+    <div class="menu-wrapper" id="menuWrapper">
+        <nav class="floating-menu">
+            <ul class="menu-list">
+                <li class="nav-item"><a href="#about" class="nav-link active" data-target="about"><span class="active-dot"></span>About Us</a></li>
+                <li class="nav-item">
+                    <a href="#portfolio" class="nav-link" data-target="portfolio"><span class="active-dot"></span>Portfolio</a>
+                    <div class="sub-menu" id="submenu-portfolio"></div>
+                </li>
+                <li class="nav-item">
+                    <a href="#services" class="nav-link" data-target="services"><span class="active-dot"></span>Services</a>
+                    <div class="sub-menu" id="submenu-services"></div>
+                </li>
+                <li class="nav-item"><a href="#contact" class="nav-link" data-target="contact"><span class="active-dot"></span>Contact</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- 메인 컨텐츠 영역 -->
+    <main>
+        <!-- 1. About Us -->
+        <section id="about" class="about-section scroll-section">
+            <div class="spotlight-container" id="spotlightContainer">
+                <div class="svg-wrapper" id="svgWrapper">
+                    <svg id="_레이어_2" data-name="레이어 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2059.02 2342.91"> 
+                        <defs> 
+                            <style> .cls-1 { fill: url(#_무제_그라디언트_43); } </style> 
+                            <radialGradient id="_무제_그라디언트_43" data-name="무제 그라디언트 43" cx="582.64" cy="402.29" fx="1496.65" fy="402.29" r="914.01" gradientTransform="translate(1500.9649 432.7588) rotate(90) scale(1.2678 1.1719)" gradientUnits="userSpaceOnUse"> 
+                                <stop id="gradStop1" offset="0.19" stop-color="#ec6300"></stop> 
+                                <stop offset="1" stop-color="#fff" stop-opacity="0"></stop> 
+                            </radialGradient> 
+                        </defs> 
+                        <g id="_레이어_1-2" data-name="레이어 1"> 
+                            <rect class="cls-1" width="2059.02" height="2342.91" transform="translate(2059.0165 2342.9068) rotate(-180)"></rect> 
+                        </g> 
+                    </svg>
+                </div>
+            </div>
+            
+            <h2 class="main-title" id="mainTitle">몰입의 순간을 디자인하다</h2>
+        </section>
+
+        <!-- 2. Portfolio -->
+        <section id="portfolio" class="portfolio-section section-padding scroll-section view-mode-grid">
+            <div class="section-header">
+                <h2 class="section-title">Portfolio</h2>
+                <div class="category-tabs" id="filter-container">
+                    <!-- JS에서 동적 생성됨 -->
+                </div>
+            </div>
+
+            <div class="view-container">
+                <div class="grid-view-wrapper">
+                    <div class="grid-view" id="grid-view"></div>
+                    <div class="pagination" id="pagination"></div>
+                </div>
+
+                <div class="detail-view">
+                    <div class="detail-view-top">
+                        <div class="video-player-wrapper slide-center" id="video-wrapper">
+                            <div class="nav-arrow-container">
+                                <div class="nav-arrow left" id="nav-prev"><svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg></div>
+                                <div class="nav-arrow right" id="nav-next"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg></div>
+                            </div>
+                            <iframe id="main-player" src="about:blank" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                        </div>
+                        <aside class="info-box" id="info-box">
+                            <button class="btn-close-detail" id="btn-close-detail" title="그리드 뷰로 돌아가기">
+                                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                            </button>
+                            <!-- 💡 모바일 전용: 설명 펼쳐보기 버튼 -->
+                            <button class="btn-expand-detail" id="btn-expand-detail" title="설명 펼치기">
+                                <svg viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
+                            </button>
+
+                            <div class="info-category" id="info-category">Category</div>
+                            <h2 class="info-title" id="info-title">Title</h2>
+                            <div class="info-meta">
+                                <div class="meta-item"><span class="meta-label">Client</span><span class="meta-value" id="info-client">-</span></div>
+                                <div class="meta-divider"></div>
+                                <div class="meta-item"><span class="meta-label">Date</span><span class="meta-value" id="info-date">-</span></div>
+                            </div>
+                            <p class="info-desc" id="info-desc">Desc...</p>
+                            <button class="estimate-btn" id="btn-estimate-ref">이 레퍼런스로 견적 받기</button>
+                        </aside>
+                    </div>
+                    <div class="thumbnail-strip-wrapper">
+                        <div class="thumbnail-strip" id="thumbnail-strip"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Services -->
+        <section id="services" class="services-section section-padding scroll-section">
+            <div class="hero-bgs" id="hero-bgs-container">
+                <!-- JS에서 동적 생성됨 -->
+            </div>
+            <div class="hero-gradient"></div>
+            
+            <div class="section-header">
+                <h2 class="section-title">Services</h2>
+            </div>
+            
+            <div class="hero-content">
+                <h2 class="hero-title" id="hero-title">전문 촬영</h2>
+                <p class="hero-desc" id="hero-desc">다양한 환경에 대응 가능한 최적의 장비 셋팅으로 전문가가 투입되어 촬영을 진행합니다.</p>
+            </div>
+
+            <div class="posters-section" id="posters-section">
+                <div class="posters-track" id="posters-track">
+                    <!-- JS에서 동적 생성됨 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Contact & Footer -->
+        <section id="contact" class="contact-section section-padding scroll-section">
+            <div class="section-header">
+                <h2 class="contact-title">Contact Us</h2>
+                <p class="contact-desc">당신의 프로젝트를 기다립니다.<br>아래 폼을 통해 편하게 문의해 주세요.</p>
+            </div>
+
+            <div class="contact-wrapper">
+                <div class="contact-container">
+                    <form class="contact-form" id="contactForm">
+                        <!-- 이동 방지를 위해 JS가 처리하므로 폼 속성을 최소화합니다. -->
+                        <input type="hidden" name="_captcha" value="false">
+                        <div class="form-group">
+                            <label for="name">이름 / 회사명</label>
+                            <input type="text" id="name" name="Name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">답변 받을 이메일</label>
+                            <input type="email" id="email" name="Email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="serviceType">필요한 서비스</label>
+                            <select id="serviceType" name="ServiceType">
+                                <option value="영상 편집">영상 편집</option>
+                                <option value="전문 촬영">전문 촬영</option>
+                                <option value="디자인">디자인 (로고, 명함 등)</option>
+                                <option value="AI 콘텐츠">AI 콘텐츠</option>
+                                <option value="몰두 퀵서비스">몰두 퀵서비스 (Lite)</option>
+                                <option value="기타 문의">기타 문의사항</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="referenceLink">레퍼런스 링크 첨부</label>
+                            <input type="url" id="referenceLink" name="ReferenceLink">
+                        </div>
+                        <div class="form-group">
+                            <label for="message">프로젝트 내용</label>
+                            <textarea id="message" name="Message" required></textarea>
+                        </div>
+                        <button type="submit" class="contact-submit">의뢰 접수하기</button>
+                    </form>
+                </div>
+            </div>
+            
+            <footer class="footer-info">
+                <span><strong>몰두</strong> | 대표자: 신정은</span>
+                <span>영업소 소재지: 서울시 관악구 남부순환로 1990-3, 102호</span>
+                <span>TEL: 010-4885-0728</span>
+                <span>EMAIL: moldoo.studio@gmail.com</span>
+                <span>사업자등록번호: 7835600892</span>
+                <span>운영 시간: 10:00~18:00 (주말·공휴일 휴무)</span>
+            </footer>
+        </section>
+    </main>
+
+    <!-- 외부 데이터 파일 불러오기 -->
+    <script src="data.js"></script>
+
+    <!-- 핵심 로직 영역 -->
+    <script>
+        // ==========================================
+        // 1. Intro Matter.js (오프닝)
+        // ==========================================
+        const page1 = document.getElementById('page1');
+        const logoContainer = document.getElementById('logoContainer');
+        const letters = document.querySelectorAll('.letter');
+        const instruction = document.getElementById('instruction');
+        
+        let maskX = window.innerWidth / 2, maskY = window.innerHeight / 2;
+        let targetX = maskX, targetY = maskY;
+        let maskRadius = 0, targetMaskRadius = 0;
+        let isExpanded = false;
+        let radiusAnimId;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const Engine = Matter.Engine, Runner = Matter.Runner, Bodies = Matter.Bodies, Composite = Matter.Composite;
+            const engine = Engine.create(); const world = engine.world;
+            engine.gravity.y = 2; 
+            
+            const runner = Runner.create();
+            
+            const rect = page1.getBoundingClientRect();
+            const wWidth = rect.width;
+            const wHeight = rect.height;
+
+            // 💡 [모바일 로고 크기 축소 픽스] 0.25에서 0.22로 90% 정도 크기 축소 반영
+            const baseHeight = wWidth < 768 ? wWidth * 0.22 : Math.min(512, wWidth * 0.22, wHeight * 0.35);
+            const wideWidth = baseHeight * (424.55 / 186.72); 
+            const cx = wWidth / 2, cy = wHeight / 2;
+            const gapX = wWidth < 768 ? 2 : 19.2, lineGapY = wWidth < 768 ? 10 : 24; 
+            const totalRowWidth = wideWidth + baseHeight * 2 + gapX * 2;
+            const rowLeftEdge = cx - totalRowWidth / 2;
+
+            const targetPositions = [
+                { x: rowLeftEdge + wideWidth / 2, y: cy - baseHeight / 2 - lineGapY / 2 }, 
+                { x: rowLeftEdge + wideWidth + gapX + baseHeight / 2, y: cy - baseHeight / 2 - lineGapY / 2 }, 
+                { x: rowLeftEdge + wideWidth + gapX + baseHeight + gapX + baseHeight / 2, y: cy - baseHeight / 2 - lineGapY / 2 }, 
+                { x: rowLeftEdge + wideWidth / 2, y: cy + baseHeight / 2 + lineGapY / 2 }, 
+                { x: rowLeftEdge + wideWidth + gapX + baseHeight / 2, y: cy + baseHeight / 2 + lineGapY / 2 }, 
+                { x: rowLeftEdge + wideWidth + gapX + baseHeight + gapX + baseHeight / 2, y: cy + baseHeight / 2 + lineGapY / 2 }  
+            ];
+
+            const floorY = targetPositions[3].y + baseHeight / 2;
+            const invisibleGround = Bodies.rectangle(cx, floorY + 100, wWidth * 3, 200, { isStatic: true });
+            const leftWall = Bodies.rectangle(cx - totalRowWidth/2 - 100, cy, 200, wHeight * 3, { isStatic: true });
+            const rightWall = Bodies.rectangle(cx + totalRowWidth/2 + 100, cy, 200, wHeight * 3, { isStatic: true });
+            Composite.add(world, [invisibleGround, leftWall, rightWall]);
+            const letterBodies = new Array(6).fill(null);
+
+            function dropLetter(index) {
+                let el = letters[index], type = el.getAttribute('data-type');
+                let width = (index === 0 || index === 3) ? wideWidth : baseHeight;
+                el.style.width = width + 'px'; el.style.height = baseHeight + 'px';
+                
+                let startX = targetPositions[index].x + (Math.random() - 0.5) * 10;
+                let startY = targetPositions[index].y - wHeight; 
+                let startAngle = type === 'circle' ? 0 : (Math.random() - 0.5) * 0.8;
+                let props = { restitution: 0.1, friction: 0.8, density: 0.05, angle: startAngle };
+                
+                let body = type === 'circle' ? Bodies.circle(startX, startY, baseHeight / 2, props) : Bodies.rectangle(startX, startY, width, baseHeight, props);
+                letterBodies[index] = { element: el, body: body };
+                Composite.add(world, body);
+                el.style.opacity = '1';
+            }
+
+            [0, 1, 2, 3, 4, 5].forEach((idx) => { dropLetter(idx); });
+            Runner.run(runner, engine);
+            let physicsActive = true;
+
+            function syncPhysics() {
+                if (!physicsActive) return;
+                letterBodies.forEach(item => {
+                    if(item) item.element.style.transform = `translate(-50%, -50%) translate(${item.body.position.x}px, ${item.body.position.y}px) rotate(${item.body.angle}rad)`;
+                });
+                requestAnimationFrame(syncPhysics);
+            }
+            syncPhysics();
+
+            page1.style.webkitMaskImage = 'none';
+            page1.style.maskImage = 'none';
+
+            setTimeout(() => {
+                physicsActive = false;
+                Runner.stop(runner);
+                
+                letterBodies.forEach((item) => {
+                    if(item) item.element.style.transition = 'transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
+                });
+                setTimeout(() => {
+                    letterBodies.forEach((item, i) => {
+                        if(item) item.element.style.transform = `translate(-50%, -50%) translate(${targetPositions[i].x}px, ${targetPositions[i].y}px) rotate(0rad)`;
+                    });
+                }, 50);
+                setTimeout(() => {
+                    // 💡 [모바일 마스크 원형 크기 축소 픽스] 80에서 40으로 절반 축소 반영
+                    targetMaskRadius = window.innerWidth <= 1024 ? 40 : 140; 
+                    instruction.style.top = `${targetPositions[3].y + baseHeight / 2 + 70}px`;
+                    instruction.style.opacity = '1'; 
+                    page1.style.pointerEvents = 'auto';
+                }, 700); 
+            }, 1800);
+        });
+
+        window.addEventListener('mousemove', (e) => { targetX = e.clientX; targetY = e.clientY; });
+
+        function animateMaskPosition() {
+            maskX += (targetX - maskX) * 0.15; maskY += (targetY - maskY) * 0.15;
+            
+            if (!isExpanded) {
+                maskRadius += (targetMaskRadius - maskRadius) * 0.05;
+                if(targetMaskRadius > 0) {
+                    page1.style.webkitMaskImage = `radial-gradient(circle ${maskRadius}px at ${maskX}px ${maskY}px, transparent 95%, black 100%)`;
+                    page1.style.maskImage = `radial-gradient(circle ${maskRadius}px at ${maskX}px ${maskY}px, transparent 95%, black 100%)`;
+                }
+            } else {
+                page1.style.webkitMaskImage = `radial-gradient(circle ${maskRadius}px at ${maskX}px ${maskY}px, transparent 95%, black 100%)`;
+                page1.style.maskImage = `radial-gradient(circle ${maskRadius}px at ${maskX}px ${maskY}px, transparent 95%, black 100%)`;
+            }
+            radiusAnimId = requestAnimationFrame(animateMaskPosition);
+        }
+        animateMaskPosition(); 
+
+        page1.addEventListener('click', () => {
+            if (isExpanded || targetMaskRadius === 0) return; 
+            isExpanded = true;
+            document.body.classList.remove('no-scroll'); 
+            instruction.style.opacity = '0'; logoContainer.style.opacity = '0'; 
+            
+            let expandVelocity = 4;
+            function expand() {
+                if (!isExpanded) return; 
+                expandVelocity *= 1.2; 
+                maskRadius += expandVelocity; 
+                
+                if (maskRadius < Math.max(window.innerWidth, window.innerHeight) * 1.5) {
+                    requestAnimationFrame(expand);
+                } else {
+                    page1.style.transition = 'opacity 0.6s ease';
+                    page1.style.opacity = '0';
+                    setTimeout(() => {
+                        page1.style.display = 'none'; 
+                        cancelAnimationFrame(radiusAnimId);
+                    }, 600);
+                }
+            }
+            expand();
+        });
+
+        // ==========================================
+        // 2. 글로벌 색상 연동 및 스포트라이트 조명 제어
+        // ==========================================
+        const root = document.documentElement;
+        const mainTitle = document.getElementById('mainTitle');
+        const spotlight = document.getElementById('spotlightContainer');
+        const svgWrapper = document.getElementById('svgWrapper');
+        const mobileHeaderBg = document.getElementById('mobileHeaderBg');
+
+        let titleProgress = 0;
+
+        function renderGlobalScroll() {
+            const windowHeight = window.innerHeight;
+            const aboutRect = document.getElementById('about').getBoundingClientRect();
+            const contactRect = document.getElementById('contact').getBoundingClientRect();
+            
+            let aboutProg = 0;
+            if (aboutRect.top <= 0) aboutProg = Math.max(0, Math.min(1, Math.abs(aboutRect.top) / windowHeight));
+            
+            let contactProg = 0;
+            if (contactRect.top < windowHeight) contactProg = Math.max(0, Math.min(1, (windowHeight - contactRect.top) / windowHeight));
+
+            titleProgress += (aboutProg - titleProgress) * 0.08; 
+
+            let finalBgR, finalBgG, finalBgB, finalTxt;
+            if (contactProg > 0) {
+                finalBgR = Math.round(14 + (255 - 0) * contactProg);
+                finalBgG = Math.round(15 + (255 - 0) * contactProg);
+                finalBgB = Math.round(15 + (255 - 0) * contactProg);
+                finalTxt = Math.round(255 + (17 - 255) * contactProg);
+                
+                root.style.setProperty('--input-border', `rgba(0,0,0,0.3)`);
+                
+                if(mobileHeaderBg) mobileHeaderBg.classList.add('active');
+            } else {
+                finalBgR = Math.round(255 + (0 - 255) * aboutProg);
+                finalBgG = Math.round(255 + (0 - 255) * aboutProg);
+                finalBgB = Math.round(255 + (0 - 255) * aboutProg);
+                finalTxt = Math.round(17 + (255 - 17) * aboutProg);
+
+                root.style.setProperty('--input-border', `rgba(255,255,255,0.2)`);
+                
+                if(mobileHeaderBg) mobileHeaderBg.classList.remove('active');
+            }
+
+            root.style.setProperty('--bg-color', `rgb(${finalBgR}, ${finalBgG}, ${finalBgB})`);
+            root.style.setProperty('--text-color', `rgb(${finalTxt}, ${finalTxt}, ${finalTxt})`);
+
+            const textTranslateY = -(titleProgress * windowHeight * 0.5);
+            mainTitle.style.transform = `translate(-50%, calc(-50% + ${textTranslateY}px))`;
+            
+            const baseBlurY = window.innerWidth <= 480 ? 115 : (window.innerWidth <= 1024 ? 125 : -53);
+            const blurTranslateY = baseBlurY + (textTranslateY * 0.3);
+            svgWrapper.style.transform = `translate(0px, ${blurTranslateY}px) rotate(0deg) scale(1, 1)`;
+
+            spotlight.style.opacity = Math.max(0, 1 - aboutProg * 1.5);
+
+            const servicesRect = document.getElementById('services').getBoundingClientRect();
+            let servicesProg = 0;
+            if (servicesRect.top < windowHeight * 0.8) {
+                servicesProg = (windowHeight * 0.8 - servicesRect.top) / (windowHeight * 0.5);
+            }
+            servicesProg = Math.max(0, Math.min(1, servicesProg));
+            const bgsContainer = document.getElementById('hero-bgs-container');
+            if(bgsContainer) bgsContainer.style.opacity = servicesProg;
+
+            requestAnimationFrame(renderGlobalScroll);
+        }
+        renderGlobalScroll();
+
+        // ==========================================
+        // 로고 클릭 이벤트 & 이스터에그 (단체사진)
+        // ==========================================
+        const targetSequence = ['M', 'O1', 'L', 'D', 'O2', 'O3'];
+        let currentSequence = [];
+        const teamOverlay = document.getElementById('teamOverlay');
+        const teamImg = document.getElementById('teamImg');
+
+        document.querySelectorAll('.side-letter').forEach(letter => {
+            letter.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.documentElement.style.scrollSnapType = 'none';
+                document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
+                setTimeout(() => { document.documentElement.style.scrollSnapType = 'y mandatory'; }, 800);
+
+                const char = letter.getAttribute('data-char');
+                currentSequence.push(char);
+                if (currentSequence.length > 6) currentSequence.shift();
+                
+                if (JSON.stringify(currentSequence) === JSON.stringify(targetSequence)) {
+                    teamOverlay.style.display = 'flex';
+                    setTimeout(() => {
+                        teamOverlay.style.opacity = '1'; 
+                        teamImg.style.transform = 'scale(1)';
+                    }, 50);
+                    currentSequence = []; 
+                }
+            });
+        });
+
+        document.getElementById('closeTeamBtn').addEventListener('click', () => {
+            teamOverlay.style.opacity = '0'; 
+            teamImg.style.transform = 'scale(0.8)';
+            setTimeout(() => { teamOverlay.style.display = 'none'; }, 500);
+        });
+
+        // ==========================================
+        // 네비게이션 스크롤 동기화 & 서브메뉴
+        // ==========================================
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.scroll-section');
+        let isClickScrolling = false;
+
+        const subMenuPort = document.getElementById('submenu-portfolio');
+        const subMenuServ = document.getElementById('submenu-services');
+
+        if (typeof SITE_DATA !== 'undefined') {
+            const portCategories = ['All', ...new Set(SITE_DATA.portfolio.map(i => i.category))];
+            subMenuPort.innerHTML = portCategories.map((cat, i) => `<button class="sub-link ${i===0?'active':''}" data-filter="${cat}">${cat}</button>`).join('');
+
+            const servCategories = Object.keys(SITE_DATA.services).filter(k => k !== 'default');
+            subMenuServ.innerHTML = servCategories.map(k => `<button class="sub-link" data-target-id="${k}">${SITE_DATA.services[k].title.replace('<br>', ' ')}</button>`).join('');
+        }
+
+        function syncSideSubMenus(sectionId) {
+            navLinks.forEach(link => {
+                if (link.getAttribute('data-target') === sectionId) link.classList.add('active');
+                else link.classList.remove('active');
+            });
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault(); 
+                isClickScrolling = true;
+                const targetId = link.getAttribute('data-target');
+                
+                // 💡 [버그 픽스] 다른 메뉴로 이동할 때 모바일 디테일 뷰를 강제로 닫음
+                if (targetId !== 'portfolio' && typeof window.forceClosePortfolioDetail === 'function') {
+                    window.forceClosePortfolioDetail();
+                }
+
+                syncSideSubMenus(targetId);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    document.documentElement.style.scrollSnapType = 'none';
+                    targetSection.scrollIntoView({ behavior: 'smooth' });
+                    setTimeout(() => { 
+                        document.documentElement.style.scrollSnapType = 'y mandatory';
+                        isClickScrolling = false; 
+                    }, 800);
+                }
+            });
+        });
+
+        let currentActiveSection = 'about';
+        const observer = new IntersectionObserver((entries) => {
+            if (isClickScrolling) return;
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    if (id && currentActiveSection !== id) {
+                        
+                        // 💡 [버그 픽스] 스크롤로 다른 섹션에 넘어갈 때도 모바일 디테일 뷰를 초기화
+                        if (currentActiveSection === 'portfolio' && id !== 'portfolio') {
+                             if (typeof window.forceClosePortfolioDetail === 'function') {
+                                 window.forceClosePortfolioDetail();
+                             }
+                        }
+
+                        currentActiveSection = id;
+                        syncSideSubMenus(id);
+                        if (id === 'portfolio' && typeof resetPortfolio === 'function') resetPortfolio();
+                        if (id === 'services' && typeof resetServices === 'function') resetServices();
+                    }
+                }
+            });
+        }, { root: null, rootMargin: '0px', threshold: 0.5 });
+
+        sections.forEach(section => observer.observe(section));
+
+        // ==========================================
+        // 3. Portfolio (카테고리 탭, 페이지네이션)
+        // ==========================================
+        let resetPortfolio; 
+        (() => {
+            if (typeof SITE_DATA === 'undefined') return;
+
+            const portData = SITE_DATA.portfolio;
+            const PortDOM = {
+                container: document.getElementById('portfolio'), grid: document.getElementById('grid-view'),
+                player: document.getElementById('main-player'), filterWrap: document.getElementById('filter-container'), 
+                videoWrap: document.getElementById('video-wrapper'), info: document.getElementById('info-box'), 
+                pagination: document.getElementById('pagination'), prev: document.getElementById('nav-prev'), 
+                next: document.getElementById('nav-next'), iCat: document.getElementById('info-category'), 
+                iTitle: document.getElementById('info-title'), iDesc: document.getElementById('info-desc'), 
+                iClient: document.getElementById('info-client'), iDate: document.getElementById('info-date'),
+                estimateBtn: document.getElementById('btn-estimate-ref'),
+                closeBtn: document.getElementById('btn-close-detail'),
+                thumbStrip: document.getElementById('thumbnail-strip')
+            };
+
+            let curData = portData, curIdx = 0, isAnim = false;
+            let itemsPerPage = 6; 
+            let curPage = 1;
+
+            // 💡 [글로벌 함수 노출] 모바일 환경의 디테일 뷰를 언제든 그리드 뷰로 강제 초기화하는 기능
+            window.forceClosePortfolioDetail = function() {
+                if(window.innerWidth > 1024) return;
+                PortDOM.container.classList.remove('view-mode-detail');
+                PortDOM.container.classList.add('view-mode-grid');
+                PortDOM.player.src = 'about:blank';
+                PortDOM.info.classList.remove('is-expanded'); // 펼침 상태도 초기화
+                const expandBtn = document.getElementById('btn-expand-detail');
+                if(expandBtn) expandBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>';
+            };
+
+            function syncFilters(val) {
+                PortDOM.filterWrap.querySelectorAll('.category-tab').forEach(b => {
+                    if(b.dataset.filter === val) b.classList.add('active'); else b.classList.remove('active');
+                });
+                document.querySelectorAll('#submenu-portfolio .sub-link').forEach(b => {
+                    if(b.dataset.filter === val) b.classList.add('active'); else b.classList.remove('active');
+                });
+            }
+
+            function applyFilter(val) {
+                if(isAnim) return;
+                syncFilters(val);
+                curData = val === 'All' ? portData : portData.filter(i => i.category === val);
+                curPage = 1;
+                
+                renderGrid();
+                renderThumbnails(); 
+                
+                if (PortDOM.container.classList.contains('view-mode-detail')) {
+                    if (window.innerWidth <= 1024) {
+                        // 모바일: 카테고리를 누르면 무조건 그리드뷰(영상 목록)로 빠져나가도록 수정
+                        window.forceClosePortfolioDetail();
+                    } else {
+                        // PC: 카테고리를 바꿔도 영상 디테일 뷰를 유지하며 첫번째 영상을 띄워줌
+                        if(curData.length > 0) {
+                            curIdx = 0; 
+                            PortDOM.videoWrap.classList.add('no-transition', 'slide-in-from-right');
+                            setTimeout(() => { PortDOM.videoWrap.classList.remove('no-transition', 'slide-in-from-right'); PortDOM.videoWrap.classList.add('slide-center'); loadVideo(curData[0]); }, 50);
+                        } else {
+                            PortDOM.container.classList.remove('view-mode-detail');
+                            PortDOM.container.classList.add('view-mode-grid');
+                            PortDOM.player.src = 'about:blank';
+                        }
+                    }
+                } else {
+                    PortDOM.player.src = 'about:blank'; 
+                }
+            }
+
+            function renderFilters() {
+                const categories = ['All', ...new Set(portData.map(item => item.category))];
+                PortDOM.filterWrap.innerHTML = categories.map((cat, i) => `<button class="category-tab ${i===0?'active':''}" data-filter="${cat}">${cat}</button>`).join('');
+                PortDOM.filterWrap.querySelectorAll('.category-tab').forEach(btn => {
+                    btn.addEventListener('click', e => { e.preventDefault(); applyFilter(e.target.dataset.filter); });
+                });
+            }
+
+            document.querySelectorAll('#submenu-portfolio .sub-link').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.preventDefault(); applyFilter(e.target.dataset.filter);
+                    document.documentElement.style.scrollSnapType = 'none';
+                    document.getElementById('portfolio').scrollIntoView({ behavior: 'smooth' });
+                    setTimeout(() => { document.documentElement.style.scrollSnapType = 'y mandatory'; }, 800);
+                });
+            });
+
+            // 💡 [버그 픽스] Portfolio 메인 타이틀을 눌러도 디테일 뷰에서 그리드 뷰로 나가지게 연동
+            const mobileTitle = document.querySelector('#portfolio .section-title');
+            if(mobileTitle) {
+                mobileTitle.addEventListener('click', () => {
+                    if (PortDOM.container.classList.contains('view-mode-detail')) {
+                        if (window.innerWidth <= 1024) {
+                            window.forceClosePortfolioDetail();
+                        } else {
+                            PortDOM.closeBtn.click();
+                        }
+                    }
+                });
+            }
+
+            resetPortfolio = () => { applyFilter('All'); };
+
+            function renderGrid() {
+                const start = (curPage - 1) * itemsPerPage;
+                const pageData = curData.slice(start, start + itemsPerPage);
+                
+                PortDOM.grid.innerHTML = pageData.map((item, i) => `
+                    <div class="grid-item-wrapper" data-index="${start + i}">
+                        <div class="grid-item">
+                            <img loading="lazy" src="https://img.youtube.com/vi/${item.id}/mqdefault.jpg">
+                            <div class="grid-item-overlay">
+                                <div class="overlay-title">${item.title}</div>
+                            </div>
+                        </div>
+                    </div>`).join('');
+                    
+                renderPagination();
+            }
+
+            function renderPagination() {
+                const totalPages = Math.ceil(curData.length / itemsPerPage);
+                if (totalPages <= 1) { PortDOM.pagination.innerHTML = ''; return; }
+                
+                let html = '';
+                for(let i=1; i<=totalPages; i++) {
+                    html += `<button class="page-num ${i === curPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+                }
+                PortDOM.pagination.innerHTML = html;
+                PortDOM.pagination.querySelectorAll('.page-num').forEach(btn => {
+                    btn.addEventListener('click', (e) => { curPage = parseInt(e.target.dataset.page); renderGrid(); });
+                });
+            }
+
+            function renderThumbnails() {
+                if(!PortDOM.thumbStrip) return;
+                PortDOM.thumbStrip.innerHTML = curData.map((item, i) => `
+                    <div class="thumb-item-wrapper ${i === curIdx ? 'active' : ''}" data-index="${i}">
+                        <div class="thumb-item">
+                            <img loading="lazy" src="https://img.youtube.com/vi/${item.id}/mqdefault.jpg">
+                            <div class="thumb-overlay"><span class="thumb-title-text">${item.title}</span></div>
+                        </div>
+                    </div>`).join('');
+
+                PortDOM.thumbStrip.querySelectorAll('.thumb-item-wrapper').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const idx = parseInt(e.currentTarget.dataset.index);
+                        if(idx !== curIdx && !isAnim) {
+                            const dir = idx > curIdx ? 'next' : 'prev';
+                            curIdx = idx;
+                            slideVid(curData[curIdx], dir);
+                        }
+                    });
+                });
+            }
+
+            function updateThumbnailActive() {
+                if(!PortDOM.thumbStrip) return;
+                PortDOM.thumbStrip.querySelectorAll('.thumb-item-wrapper').forEach(el => el.classList.remove('active'));
+                const activeEl = PortDOM.thumbStrip.querySelector(`.thumb-item-wrapper[data-index="${curIdx}"]`);
+                if(activeEl) {
+                    activeEl.classList.add('active');
+                    activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
+            }
+
+            function loadVideo(item) {
+                // 💡 [기능 픽스] 자바스크립트로 유튜브 재생을 멈추기 위해 enablejsapi=1 옵션 추가
+                PortDOM.player.src = `https://www.youtube.com/embed/${item.id}?rel=0&autoplay=1&mute=0&controls=1&showinfo=0&enablejsapi=1`;
+                PortDOM.iCat.textContent = item.category; PortDOM.iTitle.textContent = item.title; 
+                PortDOM.iClient.textContent = item.client; PortDOM.iDate.textContent = item.date;
+                PortDOM.iDesc.innerHTML = item.desc; 
+                updateThumbnailActive();
+            }
+
+            function slideVid(item, dir) {
+                if(isAnim) return; isAnim = true;
+                PortDOM.videoWrap.classList.remove('slide-center');
+                PortDOM.info.style.transform = 'translateY(15px)'; PortDOM.info.style.opacity = '0';
+                PortDOM.videoWrap.classList.add(dir === 'next' ? 'slide-out-left' : 'slide-out-right');
+
+                setTimeout(() => {
+                    loadVideo(item);
+                    PortDOM.videoWrap.classList.add('no-transition');
+                    PortDOM.videoWrap.classList.remove('slide-out-left', 'slide-out-right');
+                    PortDOM.videoWrap.classList.add(dir === 'next' ? 'slide-in-from-right' : 'slide-in-from-left');
+                    setTimeout(() => {
+                        PortDOM.videoWrap.classList.remove('no-transition', 'slide-in-from-right', 'slide-in-from-left');
+                        PortDOM.videoWrap.classList.add('slide-center');
+                        PortDOM.info.style.transform = 'translateY(0)'; PortDOM.info.style.opacity = '1';
+                        setTimeout(() => isAnim = false, 600);
+                    }, 50);
+                }, 600);
+            }
+
+            let activeTouchIdx = -1;
+            
+            PortDOM.grid.addEventListener('click', e => {
+                const t = e.target.closest('.grid-item-wrapper'); if(!t || isAnim) return;
+                const idx = parseInt(t.dataset.index); 
+                
+                if (window.innerWidth <= 1024) {
+                    if (activeTouchIdx !== idx) {
+                        document.querySelectorAll('.grid-item').forEach(el => el.classList.remove('touch-active'));
+                        t.querySelector('.grid-item').classList.add('touch-active');
+                        activeTouchIdx = idx;
+                        return;
+                    }
+                }
+                
+                activeTouchIdx = -1;
+                curIdx = idx; 
+                PortDOM.container.classList.remove('view-mode-grid'); 
+                PortDOM.container.classList.add('view-mode-detail');
+                loadVideo(curData[curIdx]);
+            });
+
+            document.addEventListener('click', e => {
+                if (window.innerWidth <= 1024 && !e.target.closest('.grid-item-wrapper')) {
+                    document.querySelectorAll('.grid-item').forEach(el => el.classList.remove('touch-active'));
+                    activeTouchIdx = -1;
+                }
+            });
+
+            PortDOM.prev.addEventListener('click', () => { if(curData.length<=1 || isAnim) return; curIdx = (curIdx - 1 + curData.length) % curData.length; slideVid(curData[curIdx], 'prev'); });
+            PortDOM.next.addEventListener('click', () => { if(curData.length<=1 || isAnim) return; curIdx = (curIdx + 1) % curData.length; slideVid(curData[curIdx], 'next'); });
+
+            // PC 닫기 버튼 로직
+            PortDOM.closeBtn.addEventListener('click', () => {
+                PortDOM.container.classList.remove('view-mode-detail');
+                PortDOM.container.classList.add('view-mode-grid');
+                PortDOM.player.src = 'about:blank'; 
+            });
+
+            // 💡 [기능 픽스] 모바일 전용 설명 펼치기 화살표 동작 이벤트 추가
+            const expandBtn = document.getElementById('btn-expand-detail');
+            if(expandBtn) {
+                expandBtn.addEventListener('click', () => {
+                    PortDOM.info.classList.toggle('is-expanded');
+                    if (PortDOM.info.classList.contains('is-expanded')) {
+                        // 펼쳐질 때 영상 일시정지 명령 전송 및 화살표 위로 변경
+                        PortDOM.player.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+                        expandBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"/></svg>';
+                    } else {
+                        // 닫힐 때 화살표 아래로 변경
+                        expandBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>';
+                    }
+                });
+            }
+
+            PortDOM.estimateBtn.addEventListener('click', () => {
+                const item = curData[curIdx];
+                const linkInput = document.getElementById('referenceLink');
+                linkInput.value = `https://www.youtube.com/watch?v=${item.id}`;
+                
+                document.documentElement.style.scrollSnapType = 'none';
+                document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+                setTimeout(() => { document.documentElement.style.scrollSnapType = 'y mandatory'; }, 800);
+            });
+
+            renderFilters(); renderGrid(); renderThumbnails();
+        })();
+
+        // ==========================================
+        // 4. Services (데이터 연동 및 자동 전환)
+        // ==========================================
+        let resetServices;
+        (() => {
+            if (typeof SITE_DATA === 'undefined') return;
+
+            const ServData = SITE_DATA.services;
+            const ServDOM = {
+                title: document.getElementById('hero-title'), desc: document.getElementById('hero-desc'),
+                area: document.getElementById('posters-section'), track: document.getElementById('posters-track'),
+                bgsContainer: document.getElementById('hero-bgs-container')
+            };
+            
+            const serviceKeys = Object.keys(ServData).filter(k => k !== 'default');
+            if(serviceKeys.length === 0) return;
+
+            let bgsHTML = ''; let postersHTML = '';
+            Object.keys(ServData).forEach(key => {
+                const d = ServData[key];
+                bgsHTML += `<img id="bg-${key}" src="${d.bgImg}" class="hero-bg ${key===serviceKeys[0]?'active':''}" loading="lazy">`;
+                if (key !== 'default') {
+                    postersHTML += `<div class="poster-item" data-id="${key}"><img loading="lazy" src="${d.posterImg}" class="poster-img"><div class="poster-overlay"><div class="poster-title">${d.title.replace('<br>', ' ')}</div></div></div>`;
+                }
+            });
+            ServDOM.bgsContainer.innerHTML = bgsHTML; ServDOM.track.innerHTML = postersHTML;
+
+            let currentServiceIdx = 0;
+            let curState = serviceKeys[currentServiceIdx];
+            let autoSlideTimer = null;
+            
+            function changeState(id) {
+                if (curState === id && ServDOM.title.style.opacity === '1') return; 
+                curState = id;
+                const d = ServData[id];
+                
+                document.querySelectorAll('.hero-bg').forEach(bg => bg.classList.remove('active'));
+                const activeBg = document.getElementById(`bg-${id}`); if (activeBg) activeBg.classList.add('active');
+
+                document.querySelectorAll('#submenu-services .sub-link').forEach(b => {
+                    if(b.dataset.targetId === id) b.classList.add('active'); else b.classList.remove('active');
+                });
+
+                ServDOM.title.style.opacity = '0'; ServDOM.title.style.transform = 'translateY(10px)'; 
+                ServDOM.desc.style.opacity = '0'; ServDOM.desc.style.transform = 'translateY(10px)';
+                
+                setTimeout(() => {
+                    ServDOM.title.innerHTML = d.title; ServDOM.desc.innerHTML = d.desc;
+                    ServDOM.title.style.opacity = '1'; ServDOM.title.style.transform = 'translateY(0)';
+                    ServDOM.desc.style.opacity = '1'; ServDOM.desc.style.transform = 'translateY(0)';
+                }, 300); 
+            }
+
+            function startAutoSlide() {
+                if(autoSlideTimer) clearInterval(autoSlideTimer);
+                autoSlideTimer = setInterval(() => {
+                    currentServiceIdx = (currentServiceIdx + 1) % serviceKeys.length;
+                    changeState(serviceKeys[currentServiceIdx]);
+                }, 4000);
+            }
+
+            function stopAutoSlide() {
+                if(autoSlideTimer) clearInterval(autoSlideTimer);
+            }
+
+            ServDOM.track.addEventListener('mouseover', e => { 
+                stopAutoSlide();
+                const t = e.target.closest('.poster-item'); 
+                if (t) {
+                    currentServiceIdx = serviceKeys.indexOf(t.dataset.id);
+                    changeState(t.dataset.id); 
+                }
+            });
+            
+            ServDOM.track.addEventListener('mouseleave', () => {
+                startAutoSlide();
+            });
+
+            document.querySelectorAll('#submenu-services .sub-link').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.preventDefault(); 
+                    stopAutoSlide();
+                    currentServiceIdx = serviceKeys.indexOf(e.target.dataset.targetId);
+                    changeState(e.target.dataset.targetId);
+                    
+                    document.documentElement.style.scrollSnapType = 'none';
+                    document.getElementById('services').scrollIntoView({ behavior: 'smooth' });
+                    setTimeout(() => { document.documentElement.style.scrollSnapType = 'y mandatory'; }, 800);
+                    
+                    startAutoSlide();
+                });
+            });
+
+            changeState(serviceKeys[0]);
+            startAutoSlide();
+
+            resetServices = () => { 
+                currentServiceIdx = 0;
+                changeState(serviceKeys[0]); 
+                startAutoSlide(); 
+            };
+        })();
+    </script>
 </body>
-
 </html>
