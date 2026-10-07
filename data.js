@@ -55,7 +55,7 @@ const SITE_DATA = {
         },
         {
             "id": "d21eQU9Mttc",
-            "category": "포트폴리오",
+            "category": "기타",
             "title": "몰두 유튜브 편집 포트폴리오",
             "client": "MOLDOO",
             "date": "25.09",
@@ -103,7 +103,7 @@ const SITE_DATA = {
         },
         {
             "id": "es1msBPHj0Y",
-            "category": "모션그래픽",
+            "category": "모션",
             "title": "핀스낵 모션그래픽 애니메이션",
             "client": "핀스낵",
             "date": "2026.07.14",
@@ -159,7 +159,7 @@ const SITE_DATA = {
         },
         {
             "id": "lrlWkzcqF1s",
-            "category": "포트폴리오",
+            "category": "기타",
             "title": "프리랜서 MC 포트폴리오 영상",
             "client": "개인",
             "date": "",
@@ -183,7 +183,7 @@ const SITE_DATA = {
         },
         {
             "id": "agN0QS8i1uk",
-            "category": "브이로그",
+            "category": "기타",
             "title": "상하이 브이로그 영상",
             "client": "개인",
             "date": "",
@@ -199,7 +199,7 @@ const SITE_DATA = {
         },
         {
             "id": "d5BJ5o_gF5Y",
-            "category": "모션그래픽",
+            "category": "모션",
             "title": "아동 영어 교육 모션그래픽",
             "client": "K-edu",
             "date": "",
